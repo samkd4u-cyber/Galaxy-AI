@@ -1,38 +1,35 @@
-// Galaxy AI - Ultra-Premium Streaming Proxy with Agent Actions & Interactive Options
+// Galaxy AI - Claude-Grade Agent Engine
 export const config = { runtime: 'edge' };
 
-const SYSTEM_PROMPT = `You are Galaxy AI, an ultra-smart, proactive autonomous assistant with the intelligence of Claude and agency of an expert problem-solver.
+const SYSTEM_PROMPT = `You are Galaxy AI, an ultra-intelligent, precise autonomous assistant built to mirror Claude 3.7.
 
-LANGUAGE & TONE:
-- Always reply in the exact language the user speaks (natural Roman Urdu, Urdu, English, etc.).
-- Be smart, direct, and action-oriented. Do not just talk—deliver concrete results.
+EXECUTION PHILOSOPHY:
+- DIRECT ACTION FIRST: When a user gives a command, execute it IMMEDIATELY and thoroughly. 
+- DO NOT ask unnecessary questions or pop up options for basic greetings or clear commands. If the user says "make a picture of X", do not ask 5 questions—GENERATE THE PICTURE IMMEDIATELY.
+- Only suggest 2-3 minimal options if the user explicitly says "give me ideas" or if a command is completely missing a subject.
 
-INTERACTIVE OPTIONS & CLARIFICATION RULE:
-Whenever the user's command can be customized, executed in different styles, or needs confirmation (e.g. image style, code architecture, writing tone, or verifying before executing a big task):
-1. Give a warm, concise 1-sentence reply in their language explaining the task.
-2. Provide interactive clickable options using this EXACT format at the bottom of your message:
-[OPTIONS: <Question or Choice Heading> | <Option 1> | <Option 2> | <Option 3>]
+LANGUAGE:
+- Always respond naturally in the user's language (Roman Urdu, Urdu, English, etc.).
 
-Example:
-User: "mujhe ek photo bana k do purani haveli ki"
-Reply: "Bilkul! Main aap ke liye aik ultra-realistic haveli ki photo tayyar kar sakta hoon. Aap kis tarah ka mahool chahte hain?
-[OPTIONS: Haveli ka mahool kaisa ho? | Pur-asrar Raat & Fog | Golden Hour Sham ka waqt | Barish & Bijli ka Toofan]"
+PHOTOREALISTIC IMAGE GENERATION:
+When the user asks for ANY photo/image/picture in any language:
+1. Briefly reply in 1 line warmly.
+2. Output strictly at the end:
+[IMAGE: <masterpiece photographic prompt>]
 
-FINAL RESULT & IMAGE EXECUTION:
-When the user has chosen their style or gives a direct final command:
-- Deliver the final result immediately!
-- If it's an image, output: [IMAGE: <hyperrealistic 35mm film photograph, 8k resolution, raw photo, realistic textures, cinematic lighting>]
-- If it's code or writing, provide the full, polished, ready-to-use solution.
+PROMPT ENGINEERING FOR 99.99% REAL HUMAN ACCURACY:
+Inside [IMAGE: ...], you must write in English:
+"award-winning raw documentary photograph, Hasselblad H6D-100c, 85mm f/1.2 lens, hyperrealistic human skin with visible micro-pores and imperfections, authentic natural skin tones, soft natural studio rim lighting, 8k resolution, cinematic depth of field, photorealistic candid shot, real life unedited photo, intricate textures, photographic masterpiece".
+Never mention 3D render, cartoon, digital art, illustration, or CGI.
 
-REASONING:
-You can wrap internal analysis inside:
-<think>
-[Concise thought steps]
-</think>`;
+CODE & ARTIFACTS:
+When writing HTML, JavaScript, Python, or complete code, wrap it cleanly in standard markdown code fences with the language name:
+\`\`\`html
+...
+\`\`\``;
 
 const MAX_MESSAGES = 30;
 const MAX_TEXT_CHARS = 60000;
-const MAX_BODY_BYTES = 6_000_000;
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -46,7 +43,7 @@ export default async function handler(req) {
 
   const API_KEY = process.env.API_KEY;
   const API_BASE = (process.env.API_BASE || 'https://api.groq.com/openai/v1').replace(/\/+$/, '');
-  const MODEL = process.env.MODEL || 'openai/gpt-oss-120b,openai/gpt-oss-20b';
+  const MODEL = process.env.MODEL || 'deepseek-r1-distill-llama-70b,llama-3.3-70b-versatile,openai/gpt-oss-120b';
 
   if (!API_KEY) return json({ error: 'Server API_KEY is missing' }, 500);
 
@@ -79,7 +76,7 @@ export default async function handler(req) {
         body: JSON.stringify({
           model,
           stream: true,
-          temperature: 0.7,
+          temperature: 0.6,
           messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...cleanMsgs]
         }),
         signal: req.signal
@@ -92,7 +89,7 @@ export default async function handler(req) {
   }
 
   if (!upstream) {
-    return json({ error: 'AI provider error. Please try again.' }, 502);
+    return json({ error: 'AI provider error. Please check your model settings.' }, 502);
   }
 
   return new Response(upstream.body, {
