@@ -1,50 +1,38 @@
-// Galaxy AI - Ultra-Premium Streaming Proxy (Vercel Edge Runtime)
-// Supports Thinking reasoning, multilingual image generation & fast fallbacks
-
+// Galaxy AI - Ultra-Premium Streaming Proxy with Agent Actions & Interactive Options
 export const config = { runtime: 'edge' };
 
-const SYSTEM_PROMPT = `You are Galaxy AI, an ultra-intelligent, sophisticated AI assistant built with the elegance, clarity, and precision of Claude.
+const SYSTEM_PROMPT = `You are Galaxy AI, an ultra-smart, proactive autonomous assistant with the intelligence of Claude and agency of an expert problem-solver.
 
-TONE & STYLE:
-- Match the user's language immediately (if Urdu/Roman Urdu, reply warmly in natural Roman Urdu; if English, reply in pristine English).
-- Be thoughtful, precise, articulate, and structured. Use clean markdown formatting (headings, bullet points, clean code blocks).
+LANGUAGE & TONE:
+- Always reply in the exact language the user speaks (natural Roman Urdu, Urdu, English, etc.).
+- Be smart, direct, and action-oriented. Do not just talk—deliver concrete results.
 
-THINKING REASONING INSTRUCTION:
-Before answering complex, technical, or analytical questions, provide a brief, high-level reasoning process wrapped strictly inside:
+INTERACTIVE OPTIONS & CLARIFICATION RULE:
+Whenever the user's command can be customized, executed in different styles, or needs confirmation (e.g. image style, code architecture, writing tone, or verifying before executing a big task):
+1. Give a warm, concise 1-sentence reply in their language explaining the task.
+2. Provide interactive clickable options using this EXACT format at the bottom of your message:
+[OPTIONS: <Question or Choice Heading> | <Option 1> | <Option 2> | <Option 3>]
+
+Example:
+User: "mujhe ek photo bana k do purani haveli ki"
+Reply: "Bilkul! Main aap ke liye aik ultra-realistic haveli ki photo tayyar kar sakta hoon. Aap kis tarah ka mahool chahte hain?
+[OPTIONS: Haveli ka mahool kaisa ho? | Pur-asrar Raat & Fog | Golden Hour Sham ka waqt | Barish & Bijli ka Toofan]"
+
+FINAL RESULT & IMAGE EXECUTION:
+When the user has chosen their style or gives a direct final command:
+- Deliver the final result immediately!
+- If it's an image, output: [IMAGE: <hyperrealistic 35mm film photograph, 8k resolution, raw photo, realistic textures, cinematic lighting>]
+- If it's code or writing, provide the full, polished, ready-to-use solution.
+
+REASONING:
+You can wrap internal analysis inside:
 <think>
-[Your concise, fast analytical thought steps here]
-</think>
-Followed immediately by your final, polished response. Keep your thoughts fast and concise.
-
-PHOTOREALISTIC IMAGE GENERATION RULES:
-Whenever the user asks to draw, paint, create, generate, or show any image or picture in ANY language (e.g. "tasveer banao", "photo dikhao", "draw an image", "create wallpaper"):
-1. Reply conversationally to the user in their language (e.g.: "Yeh lijiye! Main ne aap ke liye aik ultra-realistic photo tayyar kar di hai.").
-2. At the very end of your response, output this exact tag:
-[IMAGE: <highly detailed English photorealistic prompt>]
-
-PROMPT FORMULATION:
-Inside [IMAGE: ...], formulate a masterpiece photography prompt. To ensure it looks like a 100% REAL human/scene and NOT an AI generation, ALWAYS include:
-"hyperrealistic candid 35mm photograph, authentic skin pores and natural textures, cinematic lighting, shot on Sony A7R IV 85mm f/1.4, raw photography, depth of field, 8k resolution, authentic real life documentary photo".`;
+[Concise thought steps]
+</think>`;
 
 const MAX_MESSAGES = 30;
 const MAX_TEXT_CHARS = 60000;
 const MAX_BODY_BYTES = 6_000_000;
-
-const hits = new Map();
-function checkRate(ip, limit) {
-  const now = Date.now();
-  const hour = 3600000;
-  if (hits.size > 5000) {
-    for (const [k, v] of hits) if (v.resetAt <= now) hits.delete(k);
-  }
-  let entry = hits.get(ip);
-  if (!entry || entry.resetAt <= now) {
-    entry = { count: 0, resetAt: now + hour };
-    hits.set(ip, entry);
-  }
-  entry.count += 1;
-  return { ok: entry.count <= limit, retryAfter: Math.ceil((entry.resetAt - now) / 1000) };
-}
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -59,19 +47,12 @@ export default async function handler(req) {
   const API_KEY = process.env.API_KEY;
   const API_BASE = (process.env.API_BASE || 'https://api.groq.com/openai/v1').replace(/\/+$/, '');
   const MODEL = process.env.MODEL || 'openai/gpt-oss-120b,openai/gpt-oss-20b';
-  const LIMIT = parseInt(process.env.HOURLY_LIMIT || '60', 10);
 
   if (!API_KEY) return json({ error: 'Server API_KEY is missing' }, 500);
 
-  const ip = (req.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
-  const rate = checkRate(ip, LIMIT);
-  if (!rate.ok) return json({ error: 'Hourly limit reached. Please wait a bit.' }, 429);
-
   let body;
   try {
-    const text = await req.text();
-    if (text.length > MAX_BODY_BYTES) return json({ error: 'Message payload too large' }, 413);
-    body = JSON.parse(text);
+    body = JSON.parse(await req.text());
   } catch {
     return json({ error: 'Invalid JSON request' }, 400);
   }
@@ -79,13 +60,16 @@ export default async function handler(req) {
   const rawMsgs = Array.isArray(body?.messages) ? body.messages : [];
   if (!rawMsgs.length) return json({ error: 'No messages provided' }, 400);
 
-  const cleanMsgs = rawMsgs.slice(-MAX_MESSAGES).map(m => ({
-    role: m.role === 'assistant' ? 'assistant' : 'user',
-    content: typeof m.content === 'string' ? m.content.slice(0, MAX_TEXT_CHARS) : String(m.content || '')
-  }));
+  const cleanMsgs = rawMsgs.slice(-MAX_MESSAGES).map(m => {
+    const rawContent = m.content !== undefined ? m.content : (m.text !== undefined ? m.text : '');
+    return {
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: typeof rawContent === 'string' ? rawContent.slice(0, MAX_TEXT_CHARS) : JSON.stringify(rawContent)
+    };
+  });
 
   const models = MODEL.split(',').map(m => m.trim()).filter(Boolean);
-  let upstream = null, lastError = '';
+  let upstream = null;
 
   for (const model of models) {
     try {
@@ -95,22 +79,20 @@ export default async function handler(req) {
         body: JSON.stringify({
           model,
           stream: true,
-          temperature: 0.6,
+          temperature: 0.7,
           messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...cleanMsgs]
         }),
         signal: req.signal
       });
 
       if (res.ok) { upstream = res; break; }
-      lastError = await res.text();
     } catch (e) {
       if (req.signal?.aborted) return new Response(null, { status: 499 });
-      lastError = e.message;
     }
   }
 
   if (!upstream) {
-    return json({ error: 'AI provider error. Please try again.', detail: lastError }, 502);
+    return json({ error: 'AI provider error. Please try again.' }, 502);
   }
 
   return new Response(upstream.body, {
