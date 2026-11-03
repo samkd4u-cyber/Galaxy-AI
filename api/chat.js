@@ -125,6 +125,8 @@ export default async function handler(req) {
   const models = MODEL.split(',').map((m) => m.trim()).filter(Boolean);
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   let upstream = null, lastStatus = 0, lastDetail = '', lastModel = models[0] || MODEL;
+  const tried = []; // short log of every failed attempt, shown in the error message
+  const reason = (d) => { try { const p = JSON.parse(d); const q = (Array.isArray(p) ? p[0] : p) || {}; return String((q.error && q.error.message) || q.message || '').replace(/\s+/g, ' ').slice(0, 90); } catch { return String(d || '').replace(/\s+/g, ' ').slice(0, 90); } };
 
   outer:
   for (const model of models) {
@@ -151,6 +153,7 @@ export default async function handler(req) {
       if (res.ok) { upstream = res; break outer; }
       lastStatus = res.status;
       try { lastDetail = (await res.text()).slice(0, 400); } catch { lastDetail = ''; }
+      tried.push(`${model}: ${lastStatus}${reason(lastDetail) ? ' ' + reason(lastDetail) : ''}`);
       if (lastStatus === 401 || lastStatus === 403) break outer; // key problem: other models will not help
       if (lastStatus >= 500) { await sleep(800); continue; }     // temporary problem: retry once
       break; // 400 / 404 / 429: go to the next model (if any)
@@ -175,6 +178,7 @@ export default async function handler(req) {
       why = (p.error && p.error.message) || p.message || '';
     } catch { why = lastDetail; }
     if (why) message += ` Provider says: ${String(why).replace(/\s+/g, ' ').slice(0, 220)}`;
+    if (tried.length > 1) message += ` | All attempts: ${tried.join(' ; ')}`;
     return json({ error: 'provider_error', message, status: lastStatus, detail: lastDetail }, lastStatus === 429 ? 429 : 502);
   }
 
