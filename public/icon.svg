@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="35%" r="80%">
+      <stop offset="0" stop-color="#2a1260"/>
+      <stop offset="1" stop-color="#070a1f"/>
+    </radialGradient>
+    <radialGradient id="planet" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#e9a8ff"/>
+      <stop offset="0.45" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#2b1b7a"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="0.5" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#e879f9"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g fill="#fff">
+    <circle cx="70" cy="90" r="3"/><circle cx="430" cy="70" r="2.5"/>
+    <circle cx="450" cy="400" r="3"/><circle cx="90" cy="430" r="2"/>
+    <circle cx="380" cy="150" r="2"/><circle cx="140" cy="170" r="1.8"/>
+  </g>
+  <circle cx="256" cy="256" r="120" fill="#8b5cf6" opacity="0.55" filter="url(#glow)"/>
+  <!-- back half of the orbit ring -->
+  <ellipse cx="256" cy="256" rx="190" ry="62" fill="none" stroke="url(#ring)" stroke-width="12" transform="rotate(-22 256 256)" opacity="0.55"/>
+  <circle cx="256" cy="256" r="108" fill="url(#planet)"/>
+  <!-- front half of the orbit ring -->
+  <path d="M 66 256 A 190 62 0 0 0 446 256" fill="none" stroke="url(#ring)" stroke-width="12" stroke-linecap="round" transform="rotate(-22 256 256)"/>
+  <circle cx="410" cy="148" r="14" fill="#22d3ee"/>
+  <circle cx="410" cy="148" r="26" fill="#22d3ee" opacity="0.35" filter="url(#glow)"/>
+</svg>

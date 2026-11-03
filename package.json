@@ -1,0 +1,11 @@
+{
+  "name": "galaxy-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Galaxy AI - a free, installable AI chat app (PWA) with a streaming Vercel Edge backend.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "type": "module"
+}
