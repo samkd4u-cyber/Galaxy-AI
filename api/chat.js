@@ -120,35 +120,62 @@ export default async function handler(req) {
     return json({ error: 'bad_request', message: 'Please send a "messages" array with at least one message.' }, 400);
   }
 
-  // 4) Call the provider (streaming)
-  let upstream;
-  try {
-    upstream = await fetch(`${API_BASE}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        stream: true,
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-      }),
-      signal: req.signal, // stops the provider call when the user presses Stop
-    });
-  } catch (err) {
-    return json({ error: 'provider_unreachable', message: 'Could not reach the AI provider. Please try again in a moment.' }, 502);
+  // 4) Call the provider (streaming).
+  // MODEL can be one name or a comma-separated list. If a model fails, the next one is tried.
+  const models = MODEL.split(',').map((m) => m.trim()).filter(Boolean);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let upstream = null, lastStatus = 0, lastDetail = '', lastModel = models[0] || MODEL;
+
+  outer:
+  for (const model of models) {
+    lastModel = model;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      let res;
+      try {
+        res = await fetch(`${API_BASE}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+          body: JSON.stringify({
+            model,
+            stream: true,
+            messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+          }),
+          signal: req.signal, // stops the provider call when the user presses Stop
+        });
+      } catch (err) {
+        if (req.signal && req.signal.aborted) return new Response(null, { status: 499 });
+        lastStatus = 0; lastDetail = 'network error';
+        await sleep(600);
+        continue; // try the same model once more
+      }
+      if (res.ok) { upstream = res; break outer; }
+      lastStatus = res.status;
+      try { lastDetail = (await res.text()).slice(0, 400); } catch { lastDetail = ''; }
+      if (lastStatus === 401 || lastStatus === 403) break outer; // key problem: other models will not help
+      if (lastStatus >= 500) { await sleep(800); continue; }     // temporary problem: retry once
+      break; // 400 / 404 / 429: go to the next model (if any)
+    }
   }
 
-  if (!upstream.ok) {
-    let detail = '';
-    try { detail = (await upstream.text()).slice(0, 400); } catch {}
+  if (!upstream) {
+    if (lastStatus === 0) {
+      return json({ error: 'provider_unreachable', message: 'Could not reach the AI provider. Please try again in a moment.' }, 502);
+    }
     let message = 'The AI provider returned an error.';
-    if (upstream.status === 401 || upstream.status === 403) message = 'The AI provider rejected the API key. Check API_KEY in your Vercel settings.';
-    else if (upstream.status === 404) message = 'The model was not found. Check the MODEL and API_BASE settings.';
-    else if (upstream.status === 429) message = 'The AI provider free limit was reached. Please wait a bit and try again.';
-    else if (upstream.status >= 500) message = 'The AI provider is having problems. Please try again soon.';
-    return json({ error: 'provider_error', message, status: upstream.status, detail }, upstream.status === 429 ? 429 : 502);
+    if (lastStatus === 401 || lastStatus === 403) message = 'The AI provider rejected the API key. Check API_KEY in your Vercel settings.';
+    else if (lastStatus === 404) message = 'The model was not found. Check the MODEL and API_BASE settings.';
+    else if (lastStatus === 429) message = 'The AI provider free limit was reached. Please wait a bit and try again.';
+    else if (lastStatus >= 500) message = 'The AI provider is having problems. Please try again soon.';
+    message += ` [status ${lastStatus}, model ${lastModel}]`;
+    // Add the provider's own reason (short) so problems are easy to diagnose
+    let why = '';
+    try {
+      const parsed = JSON.parse(lastDetail);
+      const p = (Array.isArray(parsed) ? parsed[0] : parsed) || {};
+      why = (p.error && p.error.message) || p.message || '';
+    } catch { why = lastDetail; }
+    if (why) message += ` Provider says: ${String(why).replace(/\s+/g, ' ').slice(0, 220)}`;
+    return json({ error: 'provider_error', message, status: lastStatus, detail: lastDetail }, lastStatus === 429 ? 429 : 502);
   }
 
   // 5) Pipe the SSE stream straight back to the browser
