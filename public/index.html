@@ -350,4 +350,368 @@ body {
 <script>
 'use strict';
 const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+const store = {
+  get(k, d=null) { try { const v = localStorage.getItem('gai:'+k); return v === null ? d : v; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('gai:'+k, v); return true; } catch { return false; } }
+};
+
+let chats = [], currentId = null, busy = false, isIncognito = false;
+try { chats = JSON.parse(store.get('chats', '[]')) || []; } catch { chats = []; }
+currentId = store.get('current');
+
+function save() {
+  if (!isIncognito) {
+    store.set('chats', JSON.stringify(chats));
+    store.set('current', currentId || '');
+  }
+}
+const cur = () => chats.find(c => c.id === currentId) || null;
+
+/* Incognito Mode Toggle */
+$('#incognitoBtn').onclick = () => {
+  isIncognito = !isIncognito;
+  $('#incognitoBtn').classList.toggle('active', isIncognito);
+  if (isIncognito) {
+    currentId = null;
+    renderFeed();
+    alert('Incognito Mode ON: This chat is temporary and will NOT be saved to history.');
+  } else {
+    currentId = store.get('current');
+    renderFeed();
+  }
+};
+
+/* Custom Preferences Modal */
+$('#openCustomizeModalBtn').onclick = () => {
+  $('#customInstructionsInput').value = store.get('memory', '');
+  $('#userToneSelect').value = store.get('tone', 'Formal & Precise');
+  $('#customizeModal').classList.add('open');
+};
+$('#closeModalBtn').onclick = () => $('#customizeModal').classList.remove('open');
+$('#saveModalBtn').onclick = () => {
+  store.set('memory', $('#customInstructionsInput').value);
+  store.set('tone', $('#userToneSelect').value);
+  $('#customizeModal').classList.remove('open');
+  alert('Preferences saved successfully!');
+};
+
+/* Search Past Chats */
+$('#chatSearchInput').oninput = (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  const items = document.querySelectorAll('.chat-item');
+  items.forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
+  });
+};
+
+/* Projects Organizer */
+$('#addProjectBtn').onclick = () => {
+  const name = prompt('Enter Project Name:');
+  if (name && name.trim()) {
+    const p = document.createElement('div');
+    p.className = 'project-item';
+    p.textContent = '📁 ' + name.trim();
+    $('#projectList').appendChild(p);
+  }
+};
+
+/* Speech Recognition (Voice Mode) */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, isRecording = false;
+$('#micBtn').onclick = () => {
+  if (!SR) return alert('Speech recognition is not supported in this browser.');
+  if (isRecording && rec) { rec.stop(); return; }
+  rec = new SR();
+  rec.onstart = () => { isRecording = true; $('#micBtn').classList.add('active-mic'); };
+  rec.onresult = (e) => {
+    let t = ''; for (const r of e.results) t += r[0].transcript;
+    $('#userInput').value = t; updateSend();
+  };
+  rec.onend = () => { isRecording = false; $('#micBtn').classList.remove('active-mic'); };
+  rec.start();
+};
+
+/* 99.99% Photorealistic Image Engine */
+function translateRomanUrduToEnglish(prompt) {
+  let p = prompt.toLowerCase().replace(/(realistic|ultra realistic|real|picture|photo|banao|bana ke do|generate|image|draw|tasveer)/gi, ' ').trim();
+  const dict = [
+    { r: /\b(banda|admi|aadmi|mard)\b/g, e: 'middle-aged man with natural weathered skin and stubble' },
+    { r: /\b(ciggrate|cigarette|sigret)\s*(pi raha|peeta|pee raha)?\b/g, e: 'smoking a burning cigarette with detailed smoke' },
+    { r: /\b(plastic ki chair|plastic chair)\b/g, e: 'weathered white monobloc plastic outdoor chair' },
+    { r: /\b(beth k|betha|baitha)\b/g, e: 'sitting' },
+    { r: /\b(purani|purana)\b/g, e: 'aged vintage' },
+    { r: /\b(haveli|mahal)\b/g, e: 'ancient architectural mansion' },
+    { r: /\b(raat)\b/g, e: 'night with cinematic moonlit shadows' }
+  ];
+  dict.forEach(item => { p = p.replace(item.r, item.e); });
+  return p.replace(/\s+/g, ' ').trim() || prompt;
+}
+
+function makeHyperRealisticFluxUrl(prompt, customSeed = null) {
+  const seed = customSeed || Math.floor(Math.random() * 9999999);
+  const cleanSubject = translateRomanUrduToEnglish(prompt);
+  const cinemaPrompt = `A raw candid 35mm film documentary photograph of ${cleanSubject}, authentic human skin texture with natural pores, unedited natural ambient lighting, shot on Canon EOS R5 85mm f1.4 lens, depth of field with soft bokeh, award-winning national geographic portrait photography, 8k resolution, authentic everyday realism`;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(cinemaPrompt)}?width=1024&height=1024&model=flux&enhance=true&nologo=true&seed=${seed}`;
+}
+
+function parseAIContent(raw) {
+  let text = raw;
+  let think = '';
+  const thinkMatch = text.match(/<think>([\s\S]*?)<\/think>/);
+  if (thinkMatch) {
+    think = thinkMatch[1].trim();
+    text = text.replace(/<think>[\s\S]*?<\/think>/, '').trim();
+  }
+
+  let imgPrompt = null;
+  const imgMatch = text.match(/\[IMAGE:\s*([\s\S]*?)\]/);
+  if (imgMatch) {
+    imgPrompt = imgMatch[1].trim();
+    text = text.replace(/\[IMAGE:[\s\S]*?\]/, '').trim();
+  }
+
+  let artifactCode = null;
+  const codeMatch = text.match(/```([a-z]*)\n([\s\S]*?)```/i);
+  if (codeMatch && codeMatch[2].length > 120) {
+    artifactCode = { lang: codeMatch[1] || 'code', code: codeMatch[2] };
+  }
+
+  return { think, text, imgPrompt, artifactCode };
+}
+
+function renderList() {
+  const l = $('#chatList');
+  l.innerHTML = chats.length ? '' : '<div style="color:var(--text-faint); font-size:12px; padding:10px;">No saved chats</div>';
+  chats.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'chat-item' + (c.id === currentId ? ' active' : '');
+    d.innerHTML = `<span>${esc(c.title)}</span>`;
+    d.onclick = () => { currentId = c.id; save(); renderFeed(); toggleSidebar(false); };
+    l.appendChild(d);
+  });
+}
+
+function renderFeed() {
+  const box = $('#messagesArea');
+  box.innerHTML = '';
+  const c = cur();
+  $('#welcomeHero').style.display = (!c || !c.messages.length) ? 'block' : 'none';
+  if (!c) return;
+
+  c.messages.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'doc-row';
+    const msgText = m.content || m.text || '';
+
+    if (m.role === 'user') {
+      row.innerHTML = `<div class="doc-user-label">You</div><div class="doc-user-text">${esc(msgText)}</div>`;
+    } else {
+      const { think, text, imgPrompt, artifactCode } = parseAIContent(msgText);
+      let thinkHtml = '';
+      if (think) {
+        thinkHtml = `
+          <div class="thinking-box" onclick="this.classList.toggle('expanded')">
+            <div class="thinking-header">
+              <span>Thought Process ▾</span>
+              <span>Deep Reasoning</span>
+            </div>
+            <div class="thinking-content">${esc(think)}</div>
+          </div>`;
+      }
+
+      let imgHtml = '';
+      if (imgPrompt) {
+        const url = makeHyperRealisticFluxUrl(imgPrompt);
+        imgHtml = `
+          <div class="image-showcase">
+            <img src="${url}" onclick="openLightbox('${url}')" loading="lazy">
+            <div class="image-toolbar">
+              <span>✨ 99.99% Ultra-Realistic (Flux Realism)</span>
+              <div class="img-actions">
+                <button class="img-act-btn" onclick="regenerateImage(this, '${esc(imgPrompt)}')">🔄 Regenerate</button>
+                <a class="img-act-btn" href="${url}" target="_blank" download="real-photo.jpg">Download 8K</a>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      let artifactHtml = '';
+      if (artifactCode) {
+        artifactHtml = `
+          <div style="margin:12px 0; padding:12px 16px; border-radius:12px; background:var(--bg-surface); border:1px solid var(--border-active); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:13px; font-weight:600;">Claude Artifact (${artifactCode.lang})</div>
+              <div style="font-size:11.5px; color:var(--text-muted);">Click to open interactive preview</div>
+            </div>
+            <button class="img-act-btn" onclick="openArtifact('${esc(artifactCode.code)}', '${artifactCode.lang}')">Open Artifact ↗</button>
+          </div>`;
+      }
+
+      row.innerHTML = `
+        <div class="doc-ai-label"><div class="emerald-dot" style="width:6px; height:6px;"></div> Galaxy AI</div>
+        ${thinkHtml}
+        <div class="doc-ai-body">${text.replace(/\n/g, '<br>')}</div>
+        ${artifactHtml}
+        ${imgHtml}`;
+    }
+    box.appendChild(row);
+  });
+  $('#feed').scrollTop = $('#feed').scrollHeight;
+}
+
+window.regenerateImage = function(btn, prompt) {
+  const imgCard = btn.closest('.image-showcase');
+  const img = imgCard.querySelector('img');
+  const newSeed = Math.floor(Math.random() * 9999999);
+  const newUrl = makeHyperRealisticFluxUrl(prompt, newSeed);
+  img.style.opacity = '0.3';
+  img.src = newUrl;
+  img.onload = () => { img.style.opacity = '1'; };
+};
+
+async function send(override) {
+  if (busy) return;
+  const input = $('#userInput');
+  const text = (override !== undefined ? override : input.value).trim();
+  if (!text) return;
+
+  input.value = ''; updateSend();
+  let c = cur();
+  if (!c) {
+    c = { id: uid(), title: text.slice(0, 32), messages: [] };
+    if (!isIncognito) chats.unshift(c);
+    currentId = c.id; save(); renderList();
+  }
+
+  c.messages.push({ role: 'user', content: text, text: text });
+  save(); renderFeed();
+
+  const isDirectImageReq = /(?:realistic\s+picture|picture\s+banao|photo\s+banao|tasveer\s+banao|draw|generate\s+image|make\s+a\s+picture|image\s+of)/i.test(text);
+
+  busy = true;
+  const box = $('#messagesArea');
+  const aiRow = document.createElement('div');
+  aiRow.className = 'doc-row';
+  aiRow.innerHTML = `<div class="doc-ai-label"><div class="emerald-dot" style="width:6px; height:6px;"></div> Galaxy AI</div><div class="doc-ai-body">...</div>`;
+  box.appendChild(aiRow);
+
+  let full = '';
+  try {
+    const memory = store.get('memory', '');
+    const tone = store.get('tone', '');
+    const customPrompt = `User Tone Preference: ${tone}. User Memory Context: ${memory}`;
+
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: $('#modelSelector').value,
+        customPrompt,
+        messages: c.messages.map(m => ({ role: m.role, content: m.content || m.text }))
+      })
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || errJson.error || `Server status ${res.status}`);
+    }
+
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = dec.decode(value);
+      for (const line of chunk.split('\n')) {
+        if (line.startsWith('data:')) {
+          const raw = line.slice(5).trim();
+          if (raw === '[DONE]') continue;
+          try {
+            const j = JSON.parse(raw);
+            full += j.choices?.[0]?.delta?.content || '';
+            const parsed = parseAIContent(full);
+            aiRow.querySelector('.doc-ai-body').innerHTML = parsed.text.replace(/\n/g, '<br>') || 'Executing...';
+            $('#feed').scrollTop = $('#feed').scrollHeight;
+          } catch {}
+        }
+      }
+    }
+  } catch (err) {
+    full = `Error: ${err.message}`;
+  }
+
+  if (isDirectImageReq && !full.includes('[IMAGE:')) {
+    full += `\n\n[IMAGE: ${text}]`;
+  }
+
+  c.messages.push({ role: 'assistant', content: full, text: full });
+  save(); renderFeed();
+  busy = false;
+}
+
+function updateSend() { $('#sendBtn').disabled = !$('#userInput').value.trim(); }
+function toggleSidebar(on) { $('#sidebar').classList.toggle('open', on); }
+
+/* Interactive Artifacts Split Screen */
+window.openArtifact = function(code, lang) {
+  $('#artifactCode').textContent = code;
+  const frame = $('#artifactFrame');
+  if (lang === 'html' || code.includes('<html') || code.includes('<!DOCTYPE')) {
+    frame.srcdoc = code;
+    frame.style.display = 'block';
+    $('#artifactCode').style.display = 'none';
+    $('#tabPreviewBtn').classList.add('active');
+    $('#tabCodeBtn').classList.remove('active');
+  } else {
+    frame.style.display = 'none';
+    $('#artifactCode').style.display = 'block';
+    $('#tabPreviewBtn').classList.remove('active');
+    $('#tabCodeBtn').classList.add('active');
+  }
+  $('#artifactDrawer').classList.add('open');
+};
+$('#tabPreviewBtn').onclick = () => {
+  $('#artifactFrame').style.display = 'block';
+  $('#artifactCode').style.display = 'none';
+  $('#tabPreviewBtn').classList.add('active');
+  $('#tabCodeBtn').classList.remove('active');
+};
+$('#tabCodeBtn').onclick = () => {
+  $('#artifactFrame').style.display = 'none';
+  $('#artifactCode').style.display = 'block';
+  $('#tabCodeBtn').classList.add('active');
+  $('#tabPreviewBtn').classList.remove('active');
+};
+$('#closeArtifactBtn').onclick = () => $('#artifactDrawer').classList.remove('open');
+$('#copyArtifactBtn').onclick = () => {
+  navigator.clipboard.writeText($('#artifactCode').textContent);
+  alert('Code copied!');
+};
+
+/* Lightbox */
+function openLightbox(url) {
+  $('#lightboxImg').src = url;
+  $('#lightbox').classList.add('open');
+}
+$('#lightbox').onclick = () => $('#lightbox').classList.remove('open');
+
+/* Initial Event Bindings */
+$('#openSidebarBtn').onclick = () => toggleSidebar(true);
+$('#closeSidebarBtn').onclick = () => toggleSidebar(false);
+$('#newChatBtn').onclick = () => { currentId = null; save(); renderFeed(); toggleSidebar(false); };
+$('#clearChatsBtn').onclick = () => { if (confirm('Delete all saved chats?')) { chats = []; currentId = null; save(); renderList(); renderFeed(); } };
+$('#userInput').oninput = updateSend;
+$('#userInput').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
+$('#sendBtn').onclick = () => send();
+$('#imgToolBtn').onclick = () => {
+  const p = prompt('Describe the realistic photo you want:');
+  if (p && p.trim()) send('realistic picture banao ' + p.trim());
+};
+
+renderList();
+renderFeed();
+</script>
+</body>
+</html>
