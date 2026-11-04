@@ -267,7 +267,7 @@ async function gatherSources(candidates, clean) {
 }
 
 // ---------- handler ----------
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method === "GET") {
     const providers = configuredProviders().map((p) => ({ id: p.id, models: p.models || ["preferred free models + openrouter/free"] }));
     res.status(200).json({ ok: true, providers, webSearch: !!TAVILY_KEY() });
@@ -359,4 +359,4 @@ module.exports = async (req, res) => {
     error: "All models failed or were too slow. Try again in a minute.",
     details: failures,
   });
-};
+}
