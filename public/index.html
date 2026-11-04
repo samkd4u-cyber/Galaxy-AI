@@ -2,9 +2,9 @@
 <html lang="en" dir="ltr" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<title>Galaxy AI — Claude 3.7 Intelligence</title>
+<title>Galaxy AI — Claude Blueprint Suite</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#060907">
+<meta name="theme-color" content="#050806">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 
@@ -14,21 +14,22 @@
 
 <style>
 /* ==========================================================================
-   CLAUDE EMERALD OBSIDIAN LUXURY DESIGN
+   EMERALD OBSIDIAN CLAUDE BLUEPRINT DESIGN SYSTEM
    ========================================================================== */
 :root {
-  --bg-primary: #060907;
-  --bg-secondary: #0b110e;
-  --bg-surface: #101a15;
-  --bg-hover: #15241d;
+  --bg-primary: #050806;
+  --bg-secondary: #09100c;
+  --bg-surface: #0f1913;
+  --bg-hover: #15241b;
   --border-subtle: rgba(16, 185, 129, 0.12);
-  --border-active: rgba(16, 185, 129, 0.35);
+  --border-active: rgba(16, 185, 129, 0.38);
   --emerald: #10b981;
   --emerald-light: #34d399;
   --emerald-glow: rgba(16, 185, 129, 0.22);
+  --amber: #f59e0b;
   --text-main: #edf5f0;
-  --text-muted: #839e90;
-  --text-faint: #4e6358;
+  --text-muted: #829d8e;
+  --text-faint: #475e51;
   --danger: #f43f5e;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -43,8 +44,8 @@ body {
 
 /* Sidebar */
 .sidebar {
-  width: 260px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle);
-  display: flex; flex-direction: column; padding: 14px 12px; gap: 10px; z-index: 40;
+  width: 270px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column; padding: 14px 12px; gap: 8px; z-index: 40;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @media (max-width: 820px) {
@@ -52,101 +53,140 @@ body {
   .sidebar.open { transform: translateX(0); }
 }
 
-.brand-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 12px; border-bottom: 1px solid var(--border-subtle); }
-.brand-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: var(--text-main); }
+.brand-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 10px; border-bottom: 1px solid var(--border-subtle); }
+.brand-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15.5px; color: var(--text-main); }
 .emerald-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 10px var(--emerald); }
 
 .new-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   background: var(--bg-surface); border: 1px solid var(--border-subtle);
-  color: var(--text-main); padding: 10px 14px; border-radius: 12px;
-  font-size: 13.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
+  color: var(--text-main); padding: 9px 14px; border-radius: 12px;
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
 }
 .new-btn:hover { background: var(--bg-hover); border-color: var(--border-active); box-shadow: 0 0 16px var(--emerald-glow); }
 
-.chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+/* Search Past Chats */
+.search-box {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px;
+  background: var(--bg-surface); border: 1px solid var(--border-subtle); margin-top: 4px;
+}
+.search-input {
+  width: 100%; background: transparent; border: 0; outline: 0; color: var(--text-main); font-size: 12.5px;
+}
+.search-input::placeholder { color: var(--text-faint); }
+
+/* Projects Section */
+.project-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-faint); margin-top: 8px; padding-left: 6px; display: flex; justify-content: space-between; align-items: center; }
+.project-item { padding: 7px 10px; border-radius: 8px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.project-item:hover { background: var(--bg-surface); color: var(--text-main); }
+
+.chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
 .chat-item {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 9px 12px; border-radius: 10px; font-size: 13px; color: var(--text-muted);
+  padding: 8px 10px; border-radius: 10px; font-size: 13px; color: var(--text-muted);
   cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent;
 }
 .chat-item:hover { background: var(--bg-surface); color: var(--text-main); }
 .chat-item.active { background: var(--bg-surface); color: var(--emerald-light); border-color: var(--border-subtle); }
 .chat-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 
-/* Main Stage */
+/* Footer User & Custom Settings */
+.sidebar-footer { padding-top: 8px; border-top: 1px solid var(--border-subtle); display: flex; gap: 6px; }
+.footer-tool-btn {
+  flex: 1; padding: 7px; border-radius: 8px; background: var(--bg-surface); border: 1px solid var(--border-subtle);
+  color: var(--text-muted); font-size: 12px; cursor: pointer; text-align: center; transition: all 0.2s;
+}
+.footer-tool-btn:hover { background: var(--bg-hover); color: var(--text-main); border-color: var(--emerald); }
+
+/* Stage */
 .stage { flex: 1; display: flex; flex-direction: column; height: 100dvh; position: relative; min-width: 0; }
 .topbar {
-  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border-subtle); background: rgba(6, 9, 7, 0.7); backdrop-filter: blur(12px); z-index: 20;
+  padding: 10px 18px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle); background: rgba(5, 8, 6, 0.75); backdrop-filter: blur(14px); z-index: 20;
 }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+
+/* Model Selector Dropdown */
+.model-select {
+  background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main);
+  padding: 6px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 500; cursor: pointer; outline: 0;
+}
+.model-select:hover { border-color: var(--emerald); }
+
+/* Incognito Mode Button */
+.incognito-toggle {
+  background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-muted);
+  padding: 6px 12px; border-radius: 10px; font-size: 12.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.incognito-toggle.active {
+  background: rgba(245, 158, 11, 0.12); border-color: var(--amber); color: var(--amber);
+}
+
 .icon-btn {
   background: transparent; border: 1px solid transparent; color: var(--text-muted);
-  width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; cursor: pointer; transition: all 0.2s;
+  width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; cursor: pointer; transition: all 0.2s;
 }
 .icon-btn:hover { background: var(--bg-surface); color: var(--text-main); border-color: var(--border-subtle); }
 
-/* Document Style Feed */
+/* Document Feed */
 .content-wrapper { flex: 1; display: flex; min-height: 0; position: relative; }
 .feed { flex: 1; overflow-y: auto; padding: 24px 20px; scroll-behavior: smooth; min-width: 0; }
-.doc-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 26px; }
+.doc-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
-/* Welcome Screen */
 .welcome-hero { text-align: center; padding: 12vh 10px 4vh; }
-.hero-title { font-size: clamp(30px, 5vw, 42px); font-weight: 700; letter-spacing: -0.8px; color: var(--text-main); margin-bottom: 10px; }
-.hero-sub { font-size: 15.5px; color: var(--text-muted); max-width: 500px; margin: 0 auto 28px; line-height: 1.6; }
+.hero-title { font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -0.8px; color: var(--text-main); margin-bottom: 8px; }
+.hero-sub { font-size: 15px; color: var(--text-muted); max-width: 520px; margin: 0 auto 24px; line-height: 1.6; }
 
-/* Messages */
-.doc-row { display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.3s ease; }
-.doc-user-label { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--emerald); }
-.doc-user-text { font-size: 16px; line-height: 1.6; color: var(--text-main); }
-.doc-ai-label { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-.doc-ai-body { font-size: 15.5px; line-height: 1.7; color: var(--text-main); }
+.doc-row { display: flex; flex-direction: column; gap: 6px; animation: fadeIn 0.3s ease; }
+.doc-user-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--emerald); }
+.doc-user-text { font-size: 15.5px; line-height: 1.6; color: var(--text-main); }
+.doc-ai-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.doc-ai-body { font-size: 15px; line-height: 1.7; color: var(--text-main); }
 .doc-ai-body p { margin-bottom: 12px; }
 
-/* Claude Thinking Process Accordion */
-.thinking-box { background: rgba(16, 26, 21, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
-.thinking-header { padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 500; color: var(--text-muted); cursor: pointer; }
+/* Thinking Accordion */
+.thinking-box { background: rgba(15, 25, 19, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+.thinking-header { padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; }
 .thinking-header:hover { background: var(--bg-hover); color: var(--emerald-light); }
 .thinking-content { padding: 12px 16px; font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted); border-top: 1px solid var(--border-subtle); line-height: 1.6; white-space: pre-wrap; display: none; }
 .thinking-box.expanded .thinking-content { display: block; }
 
-/* Claude Artifacts Side Panel */
+/* Claude Artifacts Split Screen */
 .artifact-drawer {
-  width: 45%; background: var(--bg-secondary); border-left: 1px solid var(--border-subtle);
+  width: 48%; background: var(--bg-secondary); border-left: 1px solid var(--border-subtle);
   display: none; flex-direction: column; z-index: 30;
 }
 .artifact-drawer.open { display: flex; }
 .artifact-top {
-  padding: 12px 16px; border-bottom: 1px solid var(--border-subtle);
+  padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
   display: flex; align-items: center; justify-content: space-between;
 }
-.artifact-code-view {
-  flex: 1; padding: 16px; font-family: var(--font-mono); font-size: 13px;
-  color: var(--text-main); overflow: auto; line-height: 1.6; background: var(--bg-primary);
-  white-space: pre;
-}
+.artifact-tabs { display: flex; gap: 4px; }
+.artifact-tab-btn { padding: 4px 10px; border-radius: 6px; border: 0; background: transparent; color: var(--text-muted); font-size: 12px; cursor: pointer; }
+.artifact-tab-btn.active { background: var(--bg-surface); color: var(--emerald-light); }
+.artifact-preview-frame { flex: 1; border: 0; background: #fff; width: 100%; }
+.artifact-code-view { flex: 1; padding: 14px; font-family: var(--font-mono); font-size: 12.5px; color: var(--text-main); overflow: auto; line-height: 1.6; background: var(--bg-primary); white-space: pre; display: none; }
 
 /* 99.99% Photorealistic Image Card */
 .image-showcase {
-  margin: 16px 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-active);
+  margin: 14px 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-active);
   background: var(--bg-surface); box-shadow: var(--shadow-lux); max-width: 580px;
 }
 .image-showcase img { width: 100%; height: auto; display: block; cursor: pointer; }
-.image-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); }
-.image-toolbar span { font-size: 12.5px; font-weight: 600; color: var(--emerald-light); }
-.img-actions { display: flex; gap: 8px; }
+.image-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); }
+.image-toolbar span { font-size: 12px; font-weight: 600; color: var(--emerald-light); }
+.img-actions { display: flex; gap: 6px; }
 .img-act-btn {
   background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main);
-  padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; text-decoration: none; font-weight: 500;
+  padding: 5px 10px; border-radius: 8px; font-size: 11.5px; cursor: pointer; text-decoration: none; font-weight: 500;
 }
 .img-act-btn:hover { border-color: var(--emerald); color: var(--emerald-light); }
 
-/* Minimalist Composer */
-.composer-dock { padding: 8px 16px 20px; max-width: 820px; width: 100%; margin: 0 auto; }
+/* Composer */
+.composer-dock { padding: 6px 16px 18px; max-width: 800px; width: 100%; margin: 0 auto; }
 .composer-box {
   background: var(--bg-surface); border: 1px solid var(--border-subtle);
-  border-radius: 22px; padding: 8px 12px; display: flex; align-items: flex-end; gap: 8px;
+  border-radius: 22px; padding: 8px 12px; display: flex; align-items: flex-end; gap: 6px;
   transition: all 0.2s ease; box-shadow: var(--shadow-lux);
 }
 .composer-box:focus-within { border-color: var(--emerald); box-shadow: 0 0 24px var(--emerald-glow); }
@@ -159,7 +199,7 @@ body {
 
 .composer-textarea {
   flex: 1; min-width: 0; background: transparent; border: 0; outline: 0;
-  color: var(--text-main); font-size: 15.5px; line-height: 1.5; resize: none; max-height: 180px; font-family: inherit;
+  color: var(--text-main); font-size: 15px; line-height: 1.5; resize: none; max-height: 180px; font-family: inherit;
   padding: 6px 2px;
 }
 .composer-textarea::placeholder { color: var(--text-faint); }
@@ -168,6 +208,17 @@ body {
   border: 0; color: #060907; display: grid; place-items: center; cursor: pointer; flex: none; font-weight: 700;
 }
 .send-action:disabled { opacity: 0.3; cursor: not-allowed; background: var(--bg-hover); color: var(--text-faint); }
+
+/* Settings Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
+.modal-overlay.open { display: grid; }
+.modal-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 22px; width: 100%; max-width: 440px; }
+.modal-card h3 { font-size: 17px; margin-bottom: 6px; }
+.modal-card p { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+.modal-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.modal-field label { font-size: 11.5px; font-weight: 600; color: var(--emerald-light); text-transform: uppercase; }
+.modal-textarea { width: 100%; height: 80px; padding: 8px 10px; border-radius: 10px; background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main); font-family: inherit; font-size: 13px; outline: 0; resize: none; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 
 .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 120; display: none; place-items: center; padding: 20px; }
 .lightbox.open { display: grid; }
@@ -185,47 +236,84 @@ body {
     <div class="brand-title"><div class="emerald-dot"></div>Galaxy AI</div>
     <button class="icon-btn" id="closeSidebarBtn">✕</button>
   </div>
+
   <button class="new-btn" id="newChatBtn">+ New Chat</button>
-  <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-faint); margin-top: 10px; padding-left: 6px;">History</div>
+
+  <!-- Search Past Chats -->
+  <div class="search-box">
+    <span style="font-size:12px; color:var(--text-faint);">🔍</span>
+    <input type="text" class="search-input" id="chatSearchInput" placeholder="Search past chats...">
+  </div>
+
+  <!-- Projects / Workspaces -->
+  <div class="project-section-title">
+    <span>Projects</span>
+    <button id="addProjectBtn" style="background:none; border:0; color:var(--emerald); cursor:pointer;">+</button>
+  </div>
+  <div id="projectList">
+    <div class="project-item">📁 General Research</div>
+  </div>
+
+  <div class="project-section-title"><span>Recent Chats</span></div>
   <div class="chat-list" id="chatList"></div>
+
+  <div class="sidebar-footer">
+    <button class="footer-tool-btn" id="openCustomizeModalBtn">⚙ Customize</button>
+    <button class="footer-tool-btn" id="clearChatsBtn">🗑 Clear</button>
+  </div>
 </aside>
 
 <main class="stage">
   <header class="topbar">
-    <button class="icon-btn" id="openSidebarBtn">☰</button>
-    <div style="font-weight: 600; font-size: 14px; color: var(--text-muted);">Galaxy AI • DeepSeek & Claude Suite</div>
-    <div style="width:36px;"></div>
+    <div class="topbar-left">
+      <button class="icon-btn" id="openSidebarBtn">☰</button>
+      <!-- Model Selector (Reasoning vs Fast) -->
+      <select class="model-select" id="modelSelector">
+        <option value="deepseek/deepseek-r1:free,openrouter/free">🧠 Claude Hybrid Reasoning (DeepSeek-R1)</option>
+        <option value="openrouter/free">⚡ Claude Fast Speed Mode</option>
+      </select>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <!-- Incognito Mode Toggle -->
+      <button class="incognito-toggle" id="incognitoBtn" title="Incognito: Chat won't be saved to history">
+        <span>👻</span> Incognito
+      </button>
+    </div>
   </header>
 
   <div class="content-wrapper">
     <div class="feed" id="feed">
       <div class="doc-container" id="docContainer">
         <section class="welcome-hero" id="welcomeHero">
-          <h1 class="hero-title">How can Galaxy AI help today?</h1>
-          <p class="hero-sub">Claude 3.7 reasoning, photorealistic 99.99% image accuracy, and instant execution.</p>
+          <h1 class="hero-title">What can Galaxy AI do for you?</h1>
+          <p class="hero-sub">Full Claude Blueprint: Deep reasoning, Live Artifacts, Incognito chats, and 99.99% realistic photography.</p>
         </section>
-        <div id="messagesArea" style="display:flex; flex-direction:column; gap:26px;"></div>
+        <div id="messagesArea" style="display:flex; flex-direction:column; gap:24px;"></div>
       </div>
     </div>
 
-    <!-- Claude Artifacts Side Panel -->
+    <!-- Claude Artifacts Split Screen Panel -->
     <aside class="artifact-drawer" id="artifactDrawer">
       <div class="artifact-top">
-        <span style="font-weight:600; font-size:13.5px;">Artifact Code Preview</span>
+        <div class="artifact-tabs">
+          <button class="artifact-tab-btn active" id="tabPreviewBtn">Preview</button>
+          <button class="artifact-tab-btn" id="tabCodeBtn">Code</button>
+        </div>
         <div style="display:flex; gap:6px;">
           <button class="img-act-btn" id="copyArtifactBtn">Copy Code</button>
           <button class="icon-btn" id="closeArtifactBtn" style="width:28px;height:28px;">✕</button>
         </div>
       </div>
+      <iframe class="artifact-preview-frame" id="artifactFrame" sandbox="allow-scripts"></iframe>
       <div class="artifact-code-view" id="artifactCode"></div>
     </aside>
   </div>
 
   <div class="composer-dock">
     <div class="composer-box">
-      <button class="tool-btn" id="imgToolBtn" title="Generate AI Image">🎨</button>
-      <textarea class="composer-textarea" id="userInput" rows="1" placeholder="Apni command likhein..."></textarea>
-      <button class="tool-btn" id="micBtn" title="Voice Input">
+      <button class="tool-btn" id="imgToolBtn" title="Generate 99.99% Photorealistic Image">🎨</button>
+      <textarea class="composer-textarea" id="userInput" rows="1" placeholder="Reply or give a command in any language..."></textarea>
+      <button class="tool-btn" id="micBtn" title="Voice Mode">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
       </button>
       <button class="send-action" id="sendBtn" disabled>↑</button>
@@ -233,311 +321,33 @@ body {
   </div>
 </main>
 
+<!-- Customize & Memory Modal -->
+<div class="modal-overlay" id="customizeModal">
+  <div class="modal-card">
+    <h3>Customize Galaxy AI</h3>
+    <p>Personal preferences for tone, format, and long-term memory.</p>
+    <div class="modal-field">
+      <label>What tone should Galaxy AI use?</label>
+      <select class="model-select" id="userToneSelect" style="width:100%;">
+        <option value="Formal & Precise">Formal & Precise (Claude Default)</option>
+        <option value="Warm & Friendly">Warm & Friendly</option>
+        <option value="Direct & Concise">Direct & Concise</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Memory & Custom Instructions</label>
+      <textarea class="modal-textarea" id="customInstructionsInput" placeholder="Tell AI what to remember about you (e.g. I am a software engineer, always reply with code first)..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="img-act-btn" id="closeModalBtn">Cancel</button>
+      <button class="img-act-btn" id="saveModalBtn" style="background:var(--emerald); color:#060907;">Save Settings</button>
+    </div>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox"><img id="lightboxImg" src=""></div>
 
 <script>
 'use strict';
 const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-
-const store = {
-  get(k, d=null) { try { const v = localStorage.getItem('gai:'+k); return v === null ? d : v; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem('gai:'+k, v); return true; } catch { return false; } }
-};
-
-let chats = [], currentId = null, busy = false;
-try { chats = JSON.parse(store.get('chats', '[]')) || []; } catch { chats = []; }
-currentId = store.get('current');
-
-function save() { store.set('chats', JSON.stringify(chats)); store.set('current', currentId || ''); }
-const cur = () => chats.find(c => c.id === currentId) || null;
-
-/* Speech Input */
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, isRecording = false;
-
-$('#micBtn').onclick = () => {
-  if (!SR) return alert('Speech recognition not supported in this browser.');
-  if (isRecording && rec) { rec.stop(); return; }
-
-  rec = new SR();
-  rec.onstart = () => { isRecording = true; $('#micBtn').classList.add('active-mic'); };
-  rec.onresult = (e) => {
-    let t = ''; for (const r of e.results) t += r[0].transcript;
-    $('#userInput').value = t; updateSend();
-  };
-  rec.onend = () => { isRecording = false; $('#micBtn').classList.remove('active-mic'); };
-  rec.start();
-};
-
-/* ==========================================================================
-   SMART ROMAN URDU TRANSLATOR & 99.99% FLUX PHOTOGRAPHY ENGINE
-   ========================================================================== */
-function translateRomanUrduToEnglish(prompt) {
-  let p = prompt.toLowerCase();
-  
-  // Remove trigger words
-  p = p.replace(/(realistic|ultra realistic|real|picture|photo|banao|bana ke do|bana do|generate|image|draw|tasveer)/gi, ' ').trim();
-  
-  // Roman Urdu vocabulary to English
-  const dict = [
-    { r: /\b(banda|admi|aadmi|mard)\b/g, e: 'middle-aged man with natural weathered skin and stubble' },
-    { r: /\b(larka|chora)\b/g, e: 'young man' },
-    { r: /\b(larki|aurat|khatoon)\b/g, e: 'woman' },
-    { r: /\b(ciggrate|cigarette|sigret|cigrate)\s*(pi raha|peeta|pee raha|peena|smoking)?\b/g, e: 'smoking a burning cigarette with realistic swirling smoke' },
-    { r: /\b(plastic ki chair|plastic chair)\b/g, e: 'weathered white monobloc plastic outdoor chair' },
-    { r: /\b(chair|kursi)\b/g, e: 'chair' },
-    { r: /\b(beth k|betha|baitha|bethi)\b/g, e: 'sitting comfortably' },
-    { r: /\b(purani|purana)\b/g, e: 'vintage aged' },
-    { r: /\b(haveli|mahal|makan)\b/g, e: 'ancient atmospheric royal mansion' },
-    { r: /\b(raat|rat)\b/g, e: 'night atmosphere with soft moonlit shadows' },
-    { r: /\b(sham|dusk)\b/g, e: 'golden hour sunset light' },
-    { r: /\b(barish|toofan)\b/g, e: 'dramatic rainy wet atmosphere' },
-    { r: /\b(billi)\b/g, e: 'cat' },
-    { r: /\b(kutta)\b/g, e: 'dog' },
-    { r: /\b(gari|car)\b/g, e: 'car' }
-  ];
-
-  dict.forEach(item => { p = p.replace(item.r, item.e); });
-  return p.replace(/\s+/g, ' ').trim() || prompt;
-}
-
-function makeHyperRealisticFluxUrl(prompt, customSeed = null) {
-  const seed = customSeed || Math.floor(Math.random() * 9999999);
-  
-  // Translate & clean
-  const translatedSubject = translateRomanUrduToEnglish(prompt);
-  
-  // Masterpiece 85mm DSLR cinematic optics
-  const cinemaPrompt = `A raw candid 35mm film documentary photograph of ${translatedSubject}, authentic natural human skin texture with real pores and fine wrinkles, unedited natural ambient lighting, shot on Canon EOS R5 85mm f1.4 lens, depth of field with soft bokeh, award-winning national geographic portrait photography, color graded, unedited, 8k resolution, authentic everyday realism`;
-  
-  // True FLUX.1 Model with prompt enhancement
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(cinemaPrompt)}?width=1024&height=1024&model=flux&enhance=true&nologo=true&seed=${seed}`;
-}
-
-function parseAIContent(raw) {
-  let text = raw;
-  let think = '';
-  const thinkMatch = text.match(/<think>([\s\S]*?)<\/think>/);
-  if (thinkMatch) {
-    think = thinkMatch[1].trim();
-    text = text.replace(/<think>[\s\S]*?<\/think>/, '').trim();
-  }
-
-  let imgPrompt = null;
-  const imgMatch = text.match(/\[IMAGE:\s*([\s\S]*?)\]/);
-  if (imgMatch) {
-    imgPrompt = imgMatch[1].trim();
-    text = text.replace(/\[IMAGE:[\s\S]*?\]/, '').trim();
-  }
-
-  let artifactCode = null;
-  const codeMatch = text.match(/```([a-z]*)\n([\s\S]*?)```/i);
-  if (codeMatch && codeMatch[2].length > 150) {
-    artifactCode = { lang: codeMatch[1] || 'code', code: codeMatch[2] };
-  }
-
-  return { think, text, imgPrompt, artifactCode };
-}
-
-function renderList() {
-  const l = $('#chatList');
-  l.innerHTML = chats.length ? '' : '<div style="color:var(--text-faint); font-size:12px; padding:10px;">No chats yet</div>';
-  chats.forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'chat-item' + (c.id === currentId ? ' active' : '');
-    d.innerHTML = `<span>${esc(c.title)}</span>`;
-    d.onclick = () => { currentId = c.id; save(); renderFeed(); toggleSidebar(false); };
-    l.appendChild(d);
-  });
-}
-
-function renderFeed() {
-  const box = $('#messagesArea');
-  box.innerHTML = '';
-  const c = cur();
-  $('#welcomeHero').style.display = (!c || !c.messages.length) ? 'block' : 'none';
-  if (!c) return;
-
-  c.messages.forEach(m => {
-    const row = document.createElement('div');
-    row.className = 'doc-row';
-    const msgText = m.content || m.text || '';
-
-    if (m.role === 'user') {
-      row.innerHTML = `<div class="doc-user-label">You</div><div class="doc-user-text">${esc(msgText)}</div>`;
-    } else {
-      const { think, text, imgPrompt, artifactCode } = parseAIContent(msgText);
-      let thinkHtml = '';
-      if (think) {
-        thinkHtml = `
-          <div class="thinking-box" onclick="this.classList.toggle('expanded')">
-            <div class="thinking-header">
-              <span>Thought Process ▾</span>
-              <span>Deep Reasoning</span>
-            </div>
-            <div class="thinking-content">${esc(think)}</div>
-          </div>`;
-      }
-
-      let imgHtml = '';
-      if (imgPrompt) {
-        const url = makeHyperRealisticFluxUrl(imgPrompt);
-        imgHtml = `
-          <div class="image-showcase">
-            <img src="${url}" onclick="openLightbox('${url}')" loading="lazy">
-            <div class="image-toolbar">
-              <span>✨ 99.99% Ultra-Realistic (Flux Realism)</span>
-              <div class="img-actions">
-                <button class="img-act-btn" onclick="regenerateImage(this, '${esc(imgPrompt)}')">🔄 Regenerate</button>
-                <a class="img-act-btn" href="${url}" target="_blank" download="real-photo.jpg">Download 8K</a>
-              </div>
-            </div>
-          </div>`;
-      }
-
-      let artifactHtml = '';
-      if (artifactCode) {
-        artifactHtml = `
-          <div style="margin:12px 0; padding:12px 16px; border-radius:12px; background:var(--bg-surface); border:1px solid var(--border-active); display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-size:13px; font-weight:600;">Claude Artifact (${artifactCode.lang})</div>
-              <div style="font-size:11.5px; color:var(--text-muted);">Side panel view available</div>
-            </div>
-            <button class="img-act-btn" onclick="openArtifact('${esc(artifactCode.code)}')">Open Artifact ↗</button>
-          </div>`;
-      }
-
-      row.innerHTML = `
-        <div class="doc-ai-label"><div class="emerald-dot" style="width:6px; height:6px;"></div> Galaxy AI</div>
-        ${thinkHtml}
-        <div class="doc-ai-body">${text.replace(/\n/g, '<br>')}</div>
-        ${artifactHtml}
-        ${imgHtml}`;
-    }
-    box.appendChild(row);
-  });
-  $('#feed').scrollTop = $('#feed').scrollHeight;
-}
-
-window.regenerateImage = function(btn, prompt) {
-  const imgCard = btn.closest('.image-showcase');
-  const img = imgCard.querySelector('img');
-  const newSeed = Math.floor(Math.random() * 9999999);
-  const newUrl = makeHyperRealisticFluxUrl(prompt, newSeed);
-  img.style.opacity = '0.4';
-  img.src = newUrl;
-  img.onload = () => { img.style.opacity = '1'; };
-  const dlBtn = imgCard.querySelector('a[download]');
-  if (dlBtn) dlBtn.href = newUrl;
-};
-
-async function send(override) {
-  if (busy) return;
-  const input = $('#userInput');
-  const text = (override !== undefined ? override : input.value).trim();
-  if (!text) return;
-
-  input.value = ''; updateSend();
-  let c = cur();
-  if (!c) {
-    c = { id: uid(), title: text.slice(0, 32), messages: [] };
-    chats.unshift(c); currentId = c.id; save(); renderList();
-  }
-
-  c.messages.push({ role: 'user', content: text, text: text });
-  save(); renderFeed();
-
-  const isDirectImageReq = /(?:realistic\s+picture|picture\s+banao|photo\s+banao|tasveer\s+banao|draw|generate\s+image|make\s+a\s+picture|image\s+of)/i.test(text);
-
-  busy = true;
-  const box = $('#messagesArea');
-  const aiRow = document.createElement('div');
-  aiRow.className = 'doc-row';
-  aiRow.innerHTML = `<div class="doc-ai-label"><div class="emerald-dot" style="width:6px; height:6px;"></div> Galaxy AI</div><div class="doc-ai-body">...</div>`;
-  box.appendChild(aiRow);
-
-  let full = '';
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: c.messages.map(m => ({ role: m.role, content: m.content || m.text }))
-      })
-    });
-
-    if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.detail || errJson.error || `Server status ${res.status}`);
-    }
-
-    const reader = res.body.getReader(), dec = new TextDecoder();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = dec.decode(value);
-      for (const line of chunk.split('\n')) {
-        if (line.startsWith('data:')) {
-          const raw = line.slice(5).trim();
-          if (raw === '[DONE]') continue;
-          try {
-            const j = JSON.parse(raw);
-            full += j.choices?.[0]?.delta?.content || '';
-            const parsed = parseAIContent(full);
-            aiRow.querySelector('.doc-ai-body').innerHTML = parsed.text.replace(/\n/g, '<br>') || 'Executing...';
-            $('#feed').scrollTop = $('#feed').scrollHeight;
-          } catch {}
-        }
-      }
-    }
-  } catch (err) {
-    full = `Error: ${err.message}`;
-  }
-
-  // Guaranteed fallback for image request
-  if (isDirectImageReq && !full.includes('[IMAGE:')) {
-    full += `\n\n[IMAGE: ${text}]`;
-  }
-
-  c.messages.push({ role: 'assistant', content: full, text: full });
-  save(); renderFeed();
-  busy = false;
-}
-
-function updateSend() { $('#sendBtn').disabled = !$('#userInput').value.trim(); }
-function toggleSidebar(on) { $('#sidebar').classList.toggle('open', on); }
-
-window.openArtifact = function(code) {
-  $('#artifactCode').textContent = code;
-  $('#artifactDrawer').classList.add('open');
-};
-$('#closeArtifactBtn').onclick = () => $('#artifactDrawer').classList.remove('open');
-$('#copyArtifactBtn').onclick = () => {
-  navigator.clipboard.writeText($('#artifactCode').textContent);
-  alert('Code copied!');
-};
-
-function openLightbox(url) {
-  $('#lightboxImg').src = url;
-  $('#lightbox').classList.add('open');
-}
-$('#lightbox').onclick = () => $('#lightbox').classList.remove('open');
-
-$('#openSidebarBtn').onclick = () => toggleSidebar(true);
-$('#closeSidebarBtn').onclick = () => toggleSidebar(false);
-$('#newChatBtn').onclick = () => { currentId = null; save(); renderFeed(); toggleSidebar(false); };
-$('#userInput').oninput = updateSend;
-$('#userInput').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
-$('#sendBtn').onclick = () => send();
-$('#imgToolBtn').onclick = () => {
-  const p = prompt('Describe the photo you want:');
-  if (p && p.trim()) send('realistic picture banao ' + p.trim());
-};
-
-renderList();
-renderFeed();
-</script>
-</body>
-</html>
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
