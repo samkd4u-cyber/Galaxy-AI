@@ -18,6 +18,16 @@ const FIRST_TOKEN_TIMEOUT_MS = 12000;
 const list = (name, fallback) =>
   process.env[name] ? process.env[name].split(",").map((s) => s.trim()).filter(Boolean) : fallback;
 
+// Accept several spellings of the same key name
+const env = (...names) => {
+  for (const n of names) if (process.env[n]) return process.env[n];
+  return "";
+};
+const GROQ_KEY = () => env("GROQ_API_KEY", "API_KEY_GROQ", "GROQ_KEY");
+const GEMINI_KEY = () => env("GEMINI_API_KEY", "API_KEY_GEMINI", "GEMINI_KEY", "GOOGLE_API_KEY");
+const OPENROUTER_KEY = () => env("OPENROUTER_API_KEY", "OPENROUTE_KEY", "OPENROUTER_KEY", "API_KEY_OPENROUTER");
+const TAVILY_KEY = () => env("TAVILY_API_KEY", "API_KEY_TAVILY", "TAVILY_KEY");
+
 const today = () => new Date().toISOString().slice(0, 10);
 
 function systemPrompt() {
@@ -34,26 +44,35 @@ function chatUrl(base) {
   return /\/chat\/completions$/.test(b) ? b : b + "/chat/completions";
 }
 
-// ---------- OpenRouter: free model ids change often, so discover them live ----------
-let orCache = { t: 0, models: [] };
-async function discoverOpenRouterFree() {
-  if (Date.now() - orCache.t < 3600e3) return orCache.models;
+// ---------- OpenRouter: free model ids change often, so check them live ----------
+const OPENROUTER_PREFERRED = [
+  "nvidia/nemotron-3.5-lightning:free",
+  "google/gemma-4-31b-it:free",
+  "nvidia/nemotron-3-ultra-550b-a55b:free",
+  "thinkingmachines/inkling:free",
+  "google/gemma-4-26b-a4b-it:free",
+];
+let orCache = { t: 0, live: null };
+async function liveOpenRouterFree() {
+  if (Date.now() - orCache.t < 3600e3) return orCache.live;
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 3000);
     const r = await fetch("https://openrouter.ai/api/v1/models", { signal: ctrl.signal });
     clearTimeout(timer);
     const j = await r.json();
-    const ids = (j.data || [])
-      .filter((m) => typeof m.id === "string" && m.id.endsWith(":free"))
-      .sort((a, b) => (b.context_length || 0) - (a.context_length || 0))
-      .slice(0, 4)
-      .map((m) => m.id);
-    orCache = { t: Date.now(), models: ids };
+    const ids = new Set((j.data || []).map((m) => m.id).filter((id) => typeof id === "string" && id.endsWith(":free")));
+    orCache = { t: Date.now(), live: ids.size ? ids : null };
   } catch (_) {
-    orCache = { t: Date.now() - 3300e3, models: orCache.models }; // retry in ~5 min
+    orCache = { t: Date.now() - 3300e3, live: orCache.live }; // retry in ~5 min
   }
-  return orCache.models;
+  return orCache.live;
+}
+async function openRouterModels() {
+  const live = await liveOpenRouterFree();
+  // keep the preferred ones that still exist; if we could not check, try them anyway
+  const preferred = live ? OPENROUTER_PREFERRED.filter((m) => live.has(m)) : OPENROUTER_PREFERRED;
+  return [...preferred, "openrouter/free"];
 }
 
 function configuredProviders() {
@@ -66,28 +85,28 @@ function configuredProviders() {
       models: list("MODEL", ["default"]),
     });
   }
-  if (process.env.GROQ_API_KEY) {
+  if (GROQ_KEY()) {
     out.push({
       id: "groq",
-      key: process.env.GROQ_API_KEY,
+      key: GROQ_KEY(),
       url: "https://api.groq.com/openai/v1/chat/completions",
-      models: list("GROQ_MODELS", ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]),
+      models: list("GROQ_MODELS", ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.6-27b"]),
     });
   }
-  if (process.env.GEMINI_API_KEY) {
+  if (GEMINI_KEY()) {
     out.push({
       id: "gemini",
-      key: process.env.GEMINI_API_KEY,
+      key: GEMINI_KEY(),
       url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
       models: list("GEMINI_MODELS", ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3-flash-preview"]),
     });
   }
-  if (process.env.OPENROUTER_API_KEY) {
+  if (OPENROUTER_KEY()) {
     out.push({
       id: "openrouter",
-      key: process.env.OPENROUTER_API_KEY,
+      key: OPENROUTER_KEY(),
       url: "https://openrouter.ai/api/v1/chat/completions",
-      models: list("OPENROUTER_MODELS", null), // null = openrouter/free + live discovery
+      models: list("OPENROUTER_MODELS", null), // null = preferred free models + openrouter/free
     });
   }
   return out;
@@ -98,7 +117,7 @@ async function buildCandidates(preferred) {
   for (const p of configuredProviders()) {
     let models = p.models;
     if (p.id === "openrouter" && !models) {
-      models = ["openrouter/free", ...(await discoverOpenRouterFree())];
+      models = await openRouterModels();
     }
     for (const m of models) all.push({ provider: p, model: m });
   }
@@ -195,7 +214,7 @@ async function tavily(query) {
     const r = await fetch("https://api.tavily.com/search", {
       method: "POST",
       signal: ctrl.signal,
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.TAVILY_API_KEY}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${TAVILY_KEY()}` },
       body: JSON.stringify({ query, max_results: 4, search_depth: "basic" }),
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -250,8 +269,8 @@ async function gatherSources(candidates, clean) {
 // ---------- handler ----------
 module.exports = async (req, res) => {
   if (req.method === "GET") {
-    const providers = configuredProviders().map((p) => ({ id: p.id, models: p.models || ["openrouter/free (+auto-discovered)"] }));
-    res.status(200).json({ ok: true, providers, webSearch: !!process.env.TAVILY_API_KEY });
+    const providers = configuredProviders().map((p) => ({ id: p.id, models: p.models || ["preferred free models + openrouter/free"] }));
+    res.status(200).json({ ok: true, providers, webSearch: !!TAVILY_KEY() });
     return;
   }
   if (req.method !== "POST") {
@@ -288,7 +307,7 @@ module.exports = async (req, res) => {
   let sources = [];
   let system = systemPrompt();
   if (body.search) {
-    if (!process.env.TAVILY_API_KEY) {
+    if (!TAVILY_KEY()) {
       searchStatus = "no-key";
     } else {
       try {
