@@ -1,769 +1,178 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Galaxy AI — Multi-Agent Suite</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#050806">
-<link rel="manifest" href="/manifest.json">
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galaxy AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* ==========================================================================
-   GALAXY AI MULTI-AGENT DESIGN SYSTEM
-   ========================================================================== */
-:root {
-  --bg-primary: #050806;
-  --bg-secondary: #09100c;
-  --bg-surface: #0f1913;
-  --bg-hover: #15241b;
-  --border-subtle: rgba(16, 185, 129, 0.12);
-  --border-active: rgba(16, 185, 129, 0.38);
-  --emerald: #10b981;
-  --emerald-light: #34d399;
-  --emerald-glow: rgba(16, 185, 129, 0.22);
-  --amber: #f59e0b;
-  --text-main: #edf5f0;
-  --text-muted: #829d8e;
-  --text-faint: #475e51;
-  --danger: #f43f5e;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --shadow-lux: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+:root{
+  --bg:#0f0d24; --surface:#19163a; --line:#2c2760; --text:#ecebfa; --muted:#948fbd;
+  --accent:#8b7cff; --user:#2a2566; --danger:#ff8a8a; --code:#0b0a1c;
 }
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-body {
-  font-family: var(--font-sans); background-color: var(--bg-primary);
-  color: var(--text-main); height: 100dvh; overflow: hidden; display: flex;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 270px; background: var(--bg-secondary); border-right: 1px solid var(--border-subtle);
-  display: flex; flex-direction: column; padding: 14px 12px; gap: 8px; z-index: 40;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@media (max-width: 820px) {
-  .sidebar { position: fixed; inset: 0 auto 0 0; transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-}
-
-.brand-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 10px; border-bottom: 1px solid var(--border-subtle); }
-.brand-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15.5px; color: var(--text-main); }
-.emerald-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 10px var(--emerald); }
-
-.new-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--bg-surface); border: 1px solid var(--border-subtle);
-  color: var(--text-main); padding: 9px 14px; border-radius: 12px;
-  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
-}
-.new-btn:hover { background: var(--bg-hover); border-color: var(--border-active); box-shadow: 0 0 16px var(--emerald-glow); }
-
-.search-box {
-  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px;
-  background: var(--bg-surface); border: 1px solid var(--border-subtle); margin-top: 4px;
-}
-.search-input { width: 100%; background: transparent; border: 0; outline: 0; color: var(--text-main); font-size: 12.5px; }
-.search-input::placeholder { color: var(--text-faint); }
-
-.project-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-faint); margin-top: 8px; padding-left: 6px; display: flex; justify-content: space-between; align-items: center; }
-.project-item { padding: 7px 10px; border-radius: 8px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
-.project-item:hover { background: var(--bg-surface); color: var(--text-main); }
-
-.chat-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
-.chat-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 10px; border-radius: 10px; font-size: 13px; color: var(--text-muted);
-  cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent;
-}
-.chat-item:hover { background: var(--bg-surface); color: var(--text-main); }
-.chat-item.active { background: var(--bg-surface); color: var(--emerald-light); border-color: var(--border-subtle); }
-.chat-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-
-.sidebar-footer { padding-top: 8px; border-top: 1px solid var(--border-subtle); display: flex; gap: 6px; }
-.footer-tool-btn {
-  flex: 1; padding: 7px; border-radius: 8px; background: var(--bg-surface); border: 1px solid var(--border-subtle);
-  color: var(--text-muted); font-size: 12px; cursor: pointer; text-align: center; transition: all 0.2s;
-}
-.footer-tool-btn:hover { background: var(--bg-hover); color: var(--text-main); border-color: var(--emerald); }
-
-/* Stage */
-.stage { flex: 1; display: flex; flex-direction: column; height: 100dvh; position: relative; min-width: 0; }
-.topbar {
-  padding: 10px 18px; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border-subtle); background: rgba(5, 8, 6, 0.75); backdrop-filter: blur(14px); z-index: 20;
-}
-.topbar-left { display: flex; align-items: center; gap: 10px; }
-
-/* Multi-Agent Selector Dropdown */
-.agent-select {
-  background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main);
-  padding: 6px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 500; cursor: pointer; outline: 0;
-  max-width: 280px;
-}
-.agent-select:hover { border-color: var(--emerald); }
-
-.incognito-toggle {
-  background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-muted);
-  padding: 6px 12px; border-radius: 10px; font-size: 12.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-  transition: all 0.2s;
-}
-.incognito-toggle.active {
-  background: rgba(245, 158, 11, 0.15); border-color: var(--amber); color: var(--amber);
-}
-
-.icon-btn {
-  background: transparent; border: 1px solid transparent; color: var(--text-muted);
-  width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; cursor: pointer; transition: all 0.2s;
-}
-.icon-btn:hover { background: var(--bg-surface); color: var(--text-main); border-color: var(--border-subtle); }
-
-/* Document Feed */
-.content-wrapper { flex: 1; display: flex; min-height: 0; position: relative; }
-.feed { flex: 1; overflow-y: auto; padding: 24px 20px; scroll-behavior: smooth; min-width: 0; }
-.doc-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
-
-.welcome-hero { text-align: center; padding: 10vh 10px 4vh; }
-.hero-title { font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -0.8px; color: var(--text-main); margin-bottom: 8px; }
-.hero-sub { font-size: 15px; color: var(--text-muted); max-width: 540px; margin: 0 auto 24px; line-height: 1.6; }
-
-/* Quick Agent Chips on Welcome Screen */
-.agent-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 700px; margin: 0 auto; }
-.agent-chip {
-  background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 8px 14px;
-  border-radius: 10px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; transition: all 0.2s;
-}
-.agent-chip:hover { border-color: var(--emerald); color: var(--emerald-light); transform: translateY(-2px); }
-
-.doc-row { display: flex; flex-direction: column; gap: 6px; animation: fadeIn 0.3s ease; }
-.doc-user-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--emerald); }
-.doc-user-text { font-size: 15.5px; line-height: 1.6; color: var(--text-main); }
-.doc-ai-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-.doc-ai-body { font-size: 15px; line-height: 1.7; color: var(--text-main); }
-.doc-ai-body p { margin-bottom: 12px; }
-
-/* Thinking Accordion */
-.thinking-box { background: rgba(15, 25, 19, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
-.thinking-header { padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; }
-.thinking-header:hover { background: var(--bg-hover); color: var(--emerald-light); }
-.thinking-content { padding: 12px 16px; font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted); border-top: 1px solid var(--border-subtle); line-height: 1.6; white-space: pre-wrap; display: none; }
-.thinking-box.expanded .thinking-content { display: block; }
-
-/* Galaxy Artifacts Split Screen */
-.artifact-drawer {
-  width: 48%; background: var(--bg-secondary); border-left: 1px solid var(--border-subtle);
-  display: none; flex-direction: column; z-index: 30;
-}
-.artifact-drawer.open { display: flex; }
-.artifact-top {
-  padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.artifact-tabs { display: flex; gap: 4px; }
-.artifact-tab-btn { padding: 4px 10px; border-radius: 6px; border: 0; background: transparent; color: var(--text-muted); font-size: 12px; cursor: pointer; }
-.artifact-tab-btn.active { background: var(--bg-surface); color: var(--emerald-light); }
-.artifact-preview-frame { flex: 1; border: 0; background: #fff; width: 100%; }
-.artifact-code-view { flex: 1; padding: 14px; font-family: var(--font-mono); font-size: 12.5px; color: var(--text-main); overflow: auto; line-height: 1.6; background: var(--bg-primary); white-space: pre; display: none; }
-
-/* 99.99% Photorealistic Image Card */
-.image-showcase {
-  margin: 14px 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-active);
-  background: var(--bg-surface); box-shadow: var(--shadow-lux); max-width: 580px;
-}
-.image-showcase img { width: 100%; height: auto; display: block; cursor: pointer; }
-.image-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); }
-.image-toolbar span { font-size: 12px; font-weight: 600; color: var(--emerald-light); }
-.img-actions { display: flex; gap: 6px; }
-.img-act-btn {
-  background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main);
-  padding: 5px 10px; border-radius: 8px; font-size: 11.5px; cursor: pointer; text-decoration: none; font-weight: 500;
-}
-.img-act-btn:hover { border-color: var(--emerald); color: var(--emerald-light); }
-
-/* Composer */
-.composer-dock { padding: 6px 16px 18px; max-width: 800px; width: 100%; margin: 0 auto; }
-.composer-box {
-  background: var(--bg-surface); border: 1px solid var(--border-subtle);
-  border-radius: 22px; padding: 8px 12px; display: flex; align-items: flex-end; gap: 6px;
-  transition: all 0.2s ease; box-shadow: var(--shadow-lux);
-}
-.composer-box:focus-within { border-color: var(--emerald); box-shadow: 0 0 24px var(--emerald-glow); }
-.tool-btn {
-  width: 34px; height: 34px; border-radius: 10px; background: transparent; border: 0;
-  color: var(--text-muted); display: grid; place-items: center; cursor: pointer; transition: all 0.15s; flex: none;
-}
-.tool-btn:hover { background: var(--bg-hover); color: var(--text-main); }
-.tool-btn.active-mic { color: #f43f5e; animation: pulse 1.2s infinite; }
-
-.composer-textarea {
-  flex: 1; min-width: 0; background: transparent; border: 0; outline: 0;
-  color: var(--text-main); font-size: 15px; line-height: 1.5; resize: none; max-height: 180px; font-family: inherit;
-  padding: 6px 2px;
-}
-.composer-textarea::placeholder { color: var(--text-faint); }
-.send-action {
-  width: 34px; height: 34px; border-radius: 10px; background: var(--emerald);
-  border: 0; color: #060907; display: grid; place-items: center; cursor: pointer; flex: none; font-weight: 700;
-}
-.send-action:disabled { opacity: 0.3; cursor: not-allowed; background: var(--bg-hover); color: var(--text-faint); }
-
-/* Settings Modal */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100; display: none; place-items: center; padding: 20px; }
-.modal-overlay.open { display: grid; }
-.modal-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 22px; width: 100%; max-width: 440px; }
-.modal-card h3 { font-size: 17px; margin-bottom: 6px; }
-.modal-card p { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
-.modal-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
-.modal-field label { font-size: 11.5px; font-weight: 600; color: var(--emerald-light); text-transform: uppercase; }
-.modal-textarea { width: 100%; height: 80px; padding: 8px 10px; border-radius: 10px; background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main); font-family: inherit; font-size: 13px; outline: 0; resize: none; }
-.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-
-.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 120; display: none; place-items: center; padding: 20px; }
-.lightbox.open { display: grid; }
-.lightbox img { max-width: 94vw; max-height: 92vh; border-radius: 12px; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;line-height:1.6}
+header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);padding-top:max(12px,env(safe-area-inset-top))}
+header h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px;flex:1}
+select,button{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+button{cursor:pointer}
+button:hover{border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.toggle{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.toggle input{accent-color:var(--accent)}
+a{color:var(--accent)}
+#chat{flex:1;overflow-y:auto;padding:20px 16px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.msg{max-width:100%;white-space:pre-wrap;word-wrap:break-word}
+.msg.user{align-self:flex-end;background:var(--user);padding:10px 14px;border-radius:16px 16px 4px 16px;max-width:85%}
+.msg.bot{align-self:flex-start;width:100%}
+.msg.error{color:var(--danger)}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+.msg code{background:var(--code);padding:1px 6px;border-radius:5px;font-size:.9em}
+.msg pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;white-space:pre;margin:8px 0}
+.msg pre code{background:none;padding:0}
+.empty{margin:auto;text-align:center;color:var(--muted);padding:40px 16px}
+.empty strong{display:block;color:var(--text);font-size:22px;margin-bottom:6px}
+form{padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.row{max-width:760px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;resize:none;max-height:160px;font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+#send{background:var(--accent);border-color:var(--accent);color:#120f2e;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.dots::after{content:"";animation:d 1s steps(4) infinite}}
+@keyframes d{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 </style>
 </head>
-
 <body>
+<header>
+  <h1>Galaxy AI</h1>
+  <select id="model" aria-label="Model">
+    <option value="auto">Auto (best available)</option>
+    <option value="groq:openai/gpt-oss-120b">Groq: GPT-OSS 120B</option>
+    <option value="gemini:gemini-2.5-flash">Gemini 2.5 Flash</option>
+    <option value="openrouter:openrouter/free">OpenRouter: free router</option>
+  </select>
+  <label class="toggle"><input type="checkbox" id="search"> Web search</label>
+  <button id="clear" type="button">New chat</button>
+</header>
 
-<aside class="sidebar" id="sidebar">
-  <div class="brand-row">
-    <div class="brand-title"><div class="emerald-dot"></div>Galaxy AI</div>
-    <button class="icon-btn" id="closeSidebarBtn">✕</button>
+<main id="chat"><div class="wrap" id="log"></div></main>
+
+<form id="form">
+  <div class="row">
+    <textarea id="input" rows="1" placeholder="Ask anything" aria-label="Message"></textarea>
+    <button id="stop" type="button" hidden>Stop</button>
+    <button id="send" type="submit">Send</button>
   </div>
-
-  <button class="new-btn" id="newChatBtn">+ New Chat</button>
-
-  <div class="search-box">
-    <span style="font-size:12px; color:var(--text-faint);">🔍</span>
-    <input type="text" class="search-input" id="chatSearchInput" placeholder="Search past chats...">
-  </div>
-
-  <div class="project-section-title">
-    <span>Projects</span>
-    <button id="addProjectBtn" style="background:none; border:0; color:var(--emerald); cursor:pointer;">+</button>
-  </div>
-  <div id="projectList">
-    <div class="project-item">📁 General Workspace</div>
-  </div>
-
-  <div class="project-section-title"><span>Recent Chats</span></div>
-  <div class="chat-list" id="chatList"></div>
-
-  <div class="sidebar-footer">
-    <button class="footer-tool-btn" id="openCustomizeModalBtn">⚙ Customize</button>
-    <button class="footer-tool-btn" id="clearChatsBtn">🗑 Clear</button>
-  </div>
-</aside>
-
-<main class="stage">
-  <header class="topbar">
-    <div class="topbar-left">
-      <button class="icon-btn" id="openSidebarBtn">☰</button>
-      <!-- Multi-Agent Dropdown (7 Free Specialized Agents) -->
-      <select class="agent-select" id="agentSelector">
-        <option value="reasoning|deepseek/deepseek-r1:free,openrouter/free">🧠 Reasoning Agent (Logic & DeepSeek)</option>
-        <option value="speed|google/gemini-2.0-flash-exp:free,openrouter/free" selected>⚡ Fast General Assistant (Instant)</option>
-        <option value="coder|qwen/qwen-2.5-coder-32b-instruct:free,openrouter/free">💻 Full-Stack Coder (Web & Python)</option>
-        <option value="research|openrouter/free">🔍 Deep Research Agent (Structured)</option>
-        <option value="writer|openrouter/free">✍️ Creative Writer & Copywriter</option>
-        <option value="cyber|openrouter/free">🛡️ Cyber & DevOps Architect</option>
-        <option value="linguist|openrouter/free">🌐 Urdu & Multilingual Specialist</option>
-      </select>
-    </div>
-    <div style="display:flex; align-items:center; gap:8px;">
-      <button class="incognito-toggle" id="incognitoBtn" title="Incognito: Temporary chat session, not saved to history">
-        <span>👻</span> Incognito
-      </button>
-    </div>
-  </header>
-
-  <div class="content-wrapper">
-    <div class="feed" id="feed">
-      <div class="doc-container" id="docContainer">
-        <section class="welcome-hero" id="welcomeHero">
-          <h1 class="hero-title">Galaxy Autonomous Multi-Agent Suite</h1>
-          <p class="hero-sub">Switch between 7 specialized AI agents: Deep reasoning, Live Artifacts, full-stack coding, and 99.99% realistic photography.</p>
-          <div class="agent-chips">
-            <button class="agent-chip" onclick="switchAgentQuick('reasoning')">🧠 Deep Reasoning</button>
-            <button class="agent-chip" onclick="switchAgentQuick('coder')">💻 Web & App Coder</button>
-            <button class="agent-chip" onclick="switchAgentQuick('research')">🔍 Deep Research</button>
-            <button class="agent-chip" onclick="switchAgentQuick('writer')">✍️ Creative Writing</button>
-            <button class="agent-chip" onclick="switchAgentQuick('cyber')">🛡️ DevOps & Linux</button>
-            <button class="agent-chip" onclick="switchAgentQuick('linguist')">🌐 Urdu & Shayeri</button>
-          </div>
-        </section>
-        <div id="messagesArea" style="display:flex; flex-direction:column; gap:24px;"></div>
-      </div>
-    </div>
-
-    <!-- Galaxy Interactive Artifacts Split Screen -->
-    <aside class="artifact-drawer" id="artifactDrawer">
-      <div class="artifact-top">
-        <div class="artifact-tabs">
-          <button class="artifact-tab-btn active" id="tabPreviewBtn">Interactive App</button>
-          <button class="artifact-tab-btn" id="tabCodeBtn">Code View</button>
-        </div>
-        <div style="display:flex; gap:6px;">
-          <button class="img-act-btn" id="copyArtifactBtn">Copy Code</button>
-          <button class="icon-btn" id="closeArtifactBtn" style="width:28px;height:28px;">✕</button>
-        </div>
-      </div>
-      <iframe class="artifact-preview-frame" id="artifactFrame" sandbox="allow-scripts allow-modals"></iframe>
-      <div class="artifact-code-view" id="artifactCode"></div>
-    </aside>
-  </div>
-
-  <div class="composer-dock">
-    <div class="composer-box">
-      <button class="tool-btn" id="imgToolBtn" title="Generate Realistic Photo">🎨</button>
-      <textarea class="composer-textarea" id="userInput" rows="1" placeholder="Reply or ask anything in any language..."></textarea>
-      <button class="tool-btn" id="micBtn" title="Voice Input">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-      </button>
-      <button class="send-action" id="sendBtn" disabled>↑</button>
-    </div>
-  </div>
-</main>
-
-<div class="modal-overlay" id="customizeModal">
-  <div class="modal-card">
-    <h3>Customize Galaxy AI</h3>
-    <p>Personal preferences for tone, format, and long-term memory.</p>
-    <div class="modal-field">
-      <label>What tone should Galaxy AI use?</label>
-      <select class="agent-select" id="userToneSelect" style="width:100%;">
-        <option value="Formal & Precise">Formal & Precise</option>
-        <option value="Warm & Friendly">Warm & Friendly</option>
-        <option value="Direct & Concise">Direct & Concise</option>
-      </select>
-    </div>
-    <div class="modal-field">
-      <label>Memory & Custom Instructions</label>
-      <textarea class="modal-textarea" id="customInstructionsInput" placeholder="Tell Galaxy AI what to remember about you..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="img-act-btn" id="closeModalBtn">Cancel</button>
-      <button class="img-act-btn" id="saveModalBtn" style="background:var(--emerald); color:#060907;">Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="lightbox" id="lightbox"><img id="lightboxImg" src=""></div>
+</form>
 
 <script>
-'use strict';
-const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const $ = (id) => document.getElementById(id);
+const log = $("log"), chat = $("chat"), input = $("input"), sendBtn = $("send"), stopBtn = $("stop");
+let messages = [];
+let controller = null;
 
-window.__ARTIFACTS__ = {};
+try { messages = JSON.parse(localStorage.getItem("galaxy-chat") || "[]"); } catch (_) {}
+const save = () => { try { localStorage.setItem("galaxy-chat", JSON.stringify(messages.slice(-40))); } catch (_) {} };
 
-const store = {
-  get(k, d=null) { try { const v = localStorage.getItem('gai:'+k); return v === null ? d : v; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem('gai:'+k, v); return true; } catch { return false; } }
-};
-
-let chats = [], currentId = null, busy = false, isIncognito = false;
-try { chats = JSON.parse(store.get('chats', '[]')) || []; } catch { chats = []; }
-currentId = store.get('current');
-
-let incognitoSession = { id: 'incognito_chat', title: 'Incognito Chat', messages: [] };
-const cur = () => isIncognito ? incognitoSession : (chats.find(c => c.id === currentId) || null);
-
-function save() {
-  if (!isIncognito) {
-    store.set('chats', JSON.stringify(chats));
-    store.set('current', currentId || '');
-  }
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function render(text){
+  const parts = text.split("```");
+  return parts.map((p, i) => {
+    if (i % 2 === 1) return "<pre><code>" + esc(p.replace(/^[\w+-]*\n/, "")) + "</code></pre>";
+    return esc(p).replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  }).join("");
 }
 
-/* Incognito Mode Toggle */
-$('#incognitoBtn').onclick = () => {
-  isIncognito = !isIncognito;
-  $('#incognitoBtn').classList.toggle('active', isIncognito);
-  if (isIncognito) {
-    incognitoSession = { id: 'incognito_' + uid(), title: 'Incognito Chat', messages: [] };
-    renderFeed();
-    alert('Incognito Mode ON: Active conversation will stay on screen while chatting, but will NEVER be saved to history.');
-  } else {
-    currentId = store.get('current');
-    renderFeed();
-  }
-};
-
-/* Quick Agent Switcher */
-window.switchAgentQuick = function(role) {
-  const sel = $('#agentSelector');
-  for (let i = 0; i < sel.options.length; i++) {
-    if (sel.options[i].value.startsWith(role + '|')) {
-      sel.selectedIndex = i;
-      break;
-    }
-  }
-  $('#userInput').focus();
-};
-
-/* Custom Preferences */
-$('#openCustomizeModalBtn').onclick = () => {
-  $('#customInstructionsInput').value = store.get('memory', '');
-  $('#userToneSelect').value = store.get('tone', 'Formal & Precise');
-  $('#customizeModal').classList.add('open');
-};
-$('#closeModalBtn').onclick = () => $('#customizeModal').classList.remove('open');
-$('#saveModalBtn').onclick = () => {
-  store.set('memory', $('#customInstructionsInput').value);
-  store.set('tone', $('#userToneSelect').value);
-  $('#customizeModal').classList.remove('open');
-};
-
-/* Search Past Chats */
-$('#chatSearchInput').oninput = (e) => {
-  const query = e.target.value.toLowerCase().trim();
-  document.querySelectorAll('.chat-item').forEach(el => {
-    el.style.display = el.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
-  });
-};
-
-/* Projects */
-$('#addProjectBtn').onclick = () => {
-  const name = prompt('Enter Project Name:');
-  if (name && name.trim()) {
-    const p = document.createElement('div');
-    p.className = 'project-item';
-    p.textContent = '📁 ' + name.trim();
-    $('#projectList').appendChild(p);
-  }
-};
-
-/* Voice Input */
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, isRecording = false;
-$('#micBtn').onclick = () => {
-  if (!SR) return alert('Speech recognition not supported in this browser.');
-  if (isRecording && rec) { rec.stop(); return; }
-  rec = new SR();
-  rec.onstart = () => { isRecording = true; $('#micBtn').classList.add('active-mic'); };
-  rec.onresult = (e) => {
-    let t = ''; for (const r of e.results) t += r[0].transcript;
-    $('#userInput').value = t; updateSend();
-  };
-  rec.onend = () => { isRecording = false; $('#micBtn').classList.remove('active-mic'); };
-  rec.start();
-};
-
-/* Natural Photorealistic Image Translator */
-function translateToNaturalEnglishPrompt(prompt) {
-  let p = prompt.toLowerCase()
-    .replace(/(realistic|ultra realistic|real|picture|photo|banao|bana ke do|bana do|generate|image|draw|tasveer)/gi, ' ')
-    .trim();
-
-  p = p.replace(/\b(banda|admi|aadmi|mard)\b/g, 'a middle-aged South Asian man')
-       .replace(/\b(larka|chora)\b/g, 'a young boy')
-       .replace(/\b(larki|aurat|khatoon)\b/g, 'a woman')
-       .replace(/\b(ciggrate|cigarette|sigret)\s*(pi raha|peeta|pee raha|peena)?\b/g, 'holding and smoking a lit cigarette with delicate smoke swirls')
-       .replace(/\b(plastic ki chair|plastic chair|kursi)\b/g, 'sitting on a worn white monobloc plastic lawn chair')
-       .replace(/\b(beth k|betha|baitha)\b/g, '')
-       .replace(/\b(py|par|pe)\b/g, '')
-       .replace(/\b(purani|purana)\b/g, 'aged vintage')
-       .replace(/\b(haveli|mahal|makan)\b/g, 'ancient haveli courtyard')
-       .replace(/\b(raat)\b/g, 'at night with cinematic ambient lighting')
-       .replace(/\b(sham)\b/g, 'during golden hour sunset');
-
-  p = p.replace(/\s+/g, ' ').trim();
-  return `A realistic raw candid photograph of ${p}, authentic everyday real life, natural skin texture with real pores, natural eye contact, shot on 35mm lens, realistic depth of field, high quality documentary photo`;
+function addMsg(role, text, extra){
+  const el = document.createElement("div");
+  el.className = "msg " + role + (extra ? " " + extra : "");
+  if (role === "bot") el.innerHTML = render(text); else el.textContent = text;
+  log.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+  return el;
 }
 
-function makeHyperRealisticFluxUrl(prompt, customSeed = null) {
-  const seed = customSeed || Math.floor(Math.random() * 9999999);
-  const cleanEnglish = translateToNaturalEnglishPrompt(prompt);
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanEnglish)}?model=flux&width=1024&height=1024&nologo=true&seed=${seed}`;
+function showEmpty(){
+  log.innerHTML = '<div class="empty"><strong>Galaxy AI</strong>Type a message to start. Pick a model above, or leave it on Auto.</div>';
 }
 
-function parseAIContent(raw) {
-  let text = raw;
-  let think = '';
-  const thinkMatch = text.match(/<think>([\s\S]*?)<\/think>/);
-  if (thinkMatch) {
-    think = thinkMatch[1].trim();
-    text = text.replace(/<think>[\s\S]*?<\/think>/, '').trim();
-  }
-
-  let imgPrompt = null;
-  const imgMatch = text.match(/\[IMAGE:\s*([\s\S]*?)\]/);
-  if (imgMatch) {
-    imgPrompt = imgMatch[1].trim();
-    text = text.replace(/\[IMAGE:[\s\S]*?\]/, '').trim();
-  }
-
-  let artifactCode = null;
-  const codeMatch = text.match(/```([a-z]*)\n([\s\S]*?)```/i);
-  if (codeMatch && codeMatch[2].length > 80) {
-    artifactCode = { lang: codeMatch[1] || 'code', code: codeMatch[2] };
-  }
-
-  return { think, text, imgPrompt, artifactCode };
+function redraw(){
+  log.innerHTML = "";
+  if (!messages.length) return showEmpty();
+  messages.forEach((m) => addMsg(m.role === "user" ? "user" : "bot", m.content));
 }
 
-function renderList() {
-  const l = $('#chatList');
-  l.innerHTML = chats.length ? '' : '<div style="color:var(--text-faint); font-size:12px; padding:10px;">No saved chats</div>';
-  chats.forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'chat-item' + (c.id === currentId ? ' active' : '');
-    d.innerHTML = `<span>${esc(c.title)}</span>`;
-    d.onclick = () => { if (!isIncognito) { currentId = c.id; save(); renderFeed(); toggleSidebar(false); } };
-    l.appendChild(d);
-  });
-}
-
-function renderFeed() {
-  const box = $('#messagesArea');
-  box.innerHTML = '';
-  const c = cur();
-  $('#welcomeHero').style.display = (!c || !c.messages.length) ? 'block' : 'none';
-  if (!c) return;
-
-  c.messages.forEach(m => {
-    const row = document.createElement('div');
-    row.className = 'doc-row';
-    const msgText = m.content || m.text || '';
-
-    if (m.role === 'user') {
-      row.innerHTML = `<div class="doc-user-label">You</div><div class="doc-user-text">${esc(msgText)}</div>`;
-    } else {
-      const { think, text, imgPrompt, artifactCode } = parseAIContent(msgText);
-      let thinkHtml = '';
-      if (think) {
-        thinkHtml = `
-          <div class="thinking-box" onclick="this.classList.toggle('expanded')">
-            <div class="thinking-header">
-              <span>Thought Process ▾</span>
-              <span>Deep Reasoning</span>
-            </div>
-            <div class="thinking-content">${esc(think)}</div>
-          </div>`;
-      }
-
-      let imgHtml = '';
-      if (imgPrompt) {
-        const url = makeHyperRealisticFluxUrl(imgPrompt);
-        imgHtml = `
-          <div class="image-showcase">
-            <img src="${url}" onclick="openLightbox('${url}')" loading="lazy">
-            <div class="image-toolbar">
-              <span>✨ 99.99% Photorealistic (FLUX.1)</span>
-              <div class="img-actions">
-                <button class="img-act-btn" onclick="regenerateImage(this, '${esc(imgPrompt)}')">🔄 Regenerate</button>
-                <a class="img-act-btn" href="${url}" target="_blank" download="real-photo.jpg">Download 8K</a>
-              </div>
-            </div>
-          </div>`;
-      }
-
-      let artifactHtml = '';
-      if (artifactCode) {
-        const artId = 'art_' + uid();
-        window.__ARTIFACTS__[artId] = { code: artifactCode.code, lang: artifactCode.lang };
-        artifactHtml = `
-          <div style="margin:12px 0; padding:12px 16px; border-radius:12px; background:var(--bg-surface); border:1px solid var(--border-active); display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-size:13px; font-weight:600;">Galaxy Artifact (${artifactCode.lang})</div>
-              <div style="font-size:11.5px; color:var(--text-muted);">Interactive Live Application</div>
-            </div>
-            <button class="img-act-btn" onclick="openArtifactById('${artId}')">Open Artifact ↗</button>
-          </div>`;
-      }
-
-      row.innerHTML = `
-        <div class="doc-ai-label"><div class="emerald-dot" style="width:6px; height:6px;"></div> Galaxy AI</div>
-        ${thinkHtml}
-        <div class="doc-ai-body">${text.replace(/\n/g, '<br>')}</div>
-        ${artifactHtml}
-        ${imgHtml}`;
-    }
-    box.appendChild(row);
-  });
-  $('#feed').scrollTop = $('#feed').scrollHeight;
-}
-
-window.regenerateImage = function(btn, prompt) {
-  const imgCard = btn.closest('.image-showcase');
-  const img = imgCard.querySelector('img');
-  const newSeed = Math.floor(Math.random() * 9999999);
-  const newUrl = makeHyperRealisticFluxUrl(prompt, newSeed);
-  img.style.opacity = '0.3';
-  img.src = newUrl;
-  img.onload = () => { img.style.opacity = '1'; };
-};
-
-/* Safe Artifact Runner */
-window.openArtifactById = function(artId) {
-  const data = window.__ARTIFACTS__[artId];
-  if (!data) return;
-  $('#artifactCode').textContent = data.code;
-  const frame = $('#artifactFrame');
-  if (data.lang === 'html' || data.code.includes('<html') || data.code.includes('<!DOCTYPE') || data.code.includes('<div') || data.code.includes('<button')) {
-    frame.srcdoc = data.code;
-    frame.style.display = 'block';
-    $('#artifactCode').style.display = 'none';
-    $('#tabPreviewBtn').classList.add('active');
-    $('#tabCodeBtn').classList.remove('active');
-  } else {
-    frame.style.display = 'none';
-    $('#artifactCode').style.display = 'block';
-    $('#tabPreviewBtn').classList.remove('active');
-    $('#tabCodeBtn').classList.add('active');
-  }
-  $('#artifactDrawer').classList.add('open');
-};
-
-async function send(override) {
-  if (busy) return;
-  const input = $('#userInput');
-  const text = (override !== undefined ? override : input.value).trim();
-  if (!text) return;
-
-  input.value = ''; updateSend();
-  let c = cur();
-  if (!c) {
-    c = { id: uid(), title: text.slice(0, 32), messages: [] };
-    if (!isIncognito) {
-      chats.unshift(c);
-      currentId = c.id;
-      save();
-      renderList();
-    }
-  }
-
-  c.messages.push({ role: 'user', content: text, text: text });
-  save(); renderFeed();
-
-  const isDirectImageReq = /(?:realistic\s+picture|picture\s+banao|photo\s+banao|tasveer\s+banao|draw|generate\s+image|make\s+a\s+picture|image\s+of)/i.test(text);
-
-  busy = true;
-  const box = $('#messagesArea');
-  const aiRow = document.createElement('div');
-  aiRow.className = 'doc-row';
-  aiRow.innerHTML = `<div class="doc-ai-label"><div class="emerald-dot" style="width:6px; height:6px;"></div> Galaxy AI</div><div class="doc-ai-body">...</div>`;
-  box.appendChild(aiRow);
-
-  // Parse Agent Role & Model
-  const [selectedAgentRole, selectedModel] = $('#agentSelector').value.split('|');
-
-  let full = '';
+async function send(text){
+  if (log.querySelector(".empty")) log.innerHTML = "";
+  messages.push({ role: "user", content: text });
+  addMsg("user", text);
+  const bot = addMsg("bot", "");
+  bot.innerHTML = '<span class="dots">Thinking</span>';
+  controller = new AbortController();
+  sendBtn.hidden = true; stopBtn.hidden = false;
+  let reply = "";
   try {
-    const memory = store.get('memory', '');
-    const tone = store.get('tone', '');
-    const customPrompt = `User Tone Preference: ${tone}. User Memory Context: ${memory}`;
-
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        agent: selectedAgentRole,
-        model: selectedModel,
-        customPrompt,
-        messages: c.messages.map(m => ({ role: m.role, content: m.content || m.text }))
-      })
+    const r = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({ messages, model: $("model").value, search: $("search").checked }),
     });
-
-    if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
-      throw new Error(errJson.detail || errJson.error || `Server status ${res.status}`);
+    if (!r.ok) {
+      let msg = "Request failed (" + r.status + ").";
+      try { const j = await r.json(); msg = j.error || msg; if (j.details) msg += "\n" + j.details.join("\n"); } catch (_) {}
+      throw new Error(msg);
     }
-
-    const reader = res.body.getReader(), dec = new TextDecoder();
+    const used = r.headers.get("X-Model-Used");
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      const chunk = dec.decode(value);
-      for (const line of chunk.split('\n')) {
-        if (line.startsWith('data:')) {
-          const raw = line.slice(5).trim();
-          if (raw === '[DONE]') continue;
-          try {
-            const j = JSON.parse(raw);
-            full += j.choices?.[0]?.delta?.content || '';
-            const parsed = parseAIContent(full);
-            aiRow.querySelector('.doc-ai-body').innerHTML = parsed.text.replace(/\n/g, '<br>') || 'Executing...';
-            $('#feed').scrollTop = $('#feed').scrollHeight;
-          } catch {}
-        }
-      }
+      reply += dec.decode(value, { stream: true });
+      bot.innerHTML = render(reply);
+      chat.scrollTop = chat.scrollHeight;
     }
-  } catch (err) {
-    full = `Error: ${err.message}`;
-  }
-
-  if (isDirectImageReq && !full.includes('[IMAGE:')) {
-    full += `\n\n[IMAGE: ${text}]`;
-  }
-
-  c.messages.push({ role: 'assistant', content: full, text: full });
-  save(); renderFeed();
-  busy = false;
-}
-
-function updateSend() { $('#sendBtn').disabled = !$('#userInput').value.trim(); }
-function toggleSidebar(on) { $('#sidebar').classList.toggle('open', on); }
-
-$('#tabPreviewBtn').onclick = () => {
-  $('#artifactFrame').style.display = 'block';
-  $('#artifactCode').style.display = 'none';
-  $('#tabPreviewBtn').classList.add('active');
-  $('#tabCodeBtn').classList.remove('active');
-};
-$('#tabCodeBtn').onclick = () => {
-  $('#artifactFrame').style.display = 'none';
-  $('#artifactCode').style.display = 'block';
-  $('#tabCodeBtn').classList.add('active');
-  $('#tabPreviewBtn').classList.remove('active');
-};
-$('#closeArtifactBtn').onclick = () => $('#artifactDrawer').classList.remove('open');
-$('#copyArtifactBtn').onclick = () => {
-  navigator.clipboard.writeText($('#artifactCode').textContent);
-  alert('Code copied!');
-};
-
-function openLightbox(url) {
-  $('#lightboxImg').src = url;
-  $('#lightbox').classList.add('open');
-}
-$('#lightbox').onclick = () => $('#lightbox').classList.remove('open');
-
-$('#openSidebarBtn').onclick = () => toggleSidebar(true);
-$('#closeSidebarBtn').onclick = () => toggleSidebar(false);
-$('#newChatBtn').onclick = () => {
-  if (isIncognito) {
-    incognitoSession = { id: 'incognito_' + uid(), title: 'Incognito Chat', messages: [] };
-  } else {
-    currentId = null;
+    const st = r.headers.get("X-Search");
+    const notes = { "no-key": "Web search is not set up yet (add TAVILY_API_KEY in Vercel).", "failed": "Web search failed, answered without it.", "none-found": "No web results found." };
+    if (used) { const m = document.createElement("div"); m.className = "meta"; m.textContent = "Answered by " + used + (st === "used" ? " with web search" : "") + (notes[st] ? ". " + notes[st] : ""); bot.appendChild(m); }
+    messages.push({ role: "assistant", content: reply });
+  } catch (e) {
+    if (e.name === "AbortError") {
+      if (reply) messages.push({ role: "assistant", content: reply });
+      else messages.pop();
+      if (!reply) bot.remove();
+    } else {
+      messages.pop();
+      bot.classList.add("error");
+      bot.textContent = e.message;
+    }
+  } finally {
+    controller = null;
+    sendBtn.hidden = false; stopBtn.hidden = true;
     save();
+    input.focus();
   }
-  renderFeed();
-  toggleSidebar(false);
-};
-$('#clearChatsBtn').onclick = () => { if (confirm('Delete all saved chats?')) { chats = []; currentId = null; save(); renderList(); renderFeed(); } };
-$('#userInput').oninput = updateSend;
-$('#userInput').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
-$('#sendBtn').onclick = () => send();
-$('#imgToolBtn').onclick = () => {
-  const p = prompt('Describe the photo you want:');
-  if (p && p.trim()) send('realistic picture banao ' + p.trim());
-};
+}
 
-renderList();
-renderFeed();
+$("form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = input.value.trim();
+  if (!text || controller) return;
+  input.value = ""; input.style.height = "auto";
+  send(text);
+});
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("form").requestSubmit(); }
+});
+input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 160) + "px"; });
+stopBtn.addEventListener("click", () => controller && controller.abort());
+$("clear").addEventListener("click", () => { if (controller) controller.abort(); messages = []; save(); redraw(); });
+
+redraw();
 </script>
 </body>
 </html>
