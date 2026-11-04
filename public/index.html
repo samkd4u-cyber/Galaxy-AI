@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<title>Galaxy AI — Intelligent Suite</title>
+<title>Galaxy AI — Multi-Agent Suite</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050806">
 <link rel="manifest" href="/manifest.json">
@@ -14,7 +14,7 @@
 
 <style>
 /* ==========================================================================
-   GALAXY AI EMERALD OBSIDIAN LUXURY DESIGN SYSTEM
+   GALAXY AI MULTI-AGENT DESIGN SYSTEM
    ========================================================================== */
 :root {
   --bg-primary: #050806;
@@ -101,11 +101,13 @@ body {
 }
 .topbar-left { display: flex; align-items: center; gap: 10px; }
 
-.model-select {
+/* Multi-Agent Selector Dropdown */
+.agent-select {
   background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main);
   padding: 6px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 500; cursor: pointer; outline: 0;
+  max-width: 280px;
 }
-.model-select:hover { border-color: var(--emerald); }
+.agent-select:hover { border-color: var(--emerald); }
 
 .incognito-toggle {
   background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-muted);
@@ -127,9 +129,17 @@ body {
 .feed { flex: 1; overflow-y: auto; padding: 24px 20px; scroll-behavior: smooth; min-width: 0; }
 .doc-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
 
-.welcome-hero { text-align: center; padding: 12vh 10px 4vh; }
+.welcome-hero { text-align: center; padding: 10vh 10px 4vh; }
 .hero-title { font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -0.8px; color: var(--text-main); margin-bottom: 8px; }
-.hero-sub { font-size: 15px; color: var(--text-muted); max-width: 520px; margin: 0 auto 24px; line-height: 1.6; }
+.hero-sub { font-size: 15px; color: var(--text-muted); max-width: 540px; margin: 0 auto 24px; line-height: 1.6; }
+
+/* Quick Agent Chips on Welcome Screen */
+.agent-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 700px; margin: 0 auto; }
+.agent-chip {
+  background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: 8px 14px;
+  border-radius: 10px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+}
+.agent-chip:hover { border-color: var(--emerald); color: var(--emerald-light); transform: translateY(-2px); }
 
 .doc-row { display: flex; flex-direction: column; gap: 6px; animation: fadeIn 0.3s ease; }
 .doc-user-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--emerald); }
@@ -259,11 +269,15 @@ body {
   <header class="topbar">
     <div class="topbar-left">
       <button class="icon-btn" id="openSidebarBtn">☰</button>
-      <!-- Multi-Agent Dropdown (All 100% Free) -->
-      <select class="model-select" id="modelSelector">
-        <option value="deepseek/deepseek-r1:free,openrouter/free">🧠 Galaxy Reasoning Agent (DeepSeek-R1)</option>
-        <option value="google/gemini-2.0-flash-exp:free,openrouter/free">⚡ Galaxy Speed Agent (Gemini Flash)</option>
-        <option value="qwen/qwen-2.5-coder-32b-instruct:free,openrouter/free">💻 Galaxy Coding Agent (Qwen 2.5 Coder)</option>
+      <!-- Multi-Agent Dropdown (7 Free Specialized Agents) -->
+      <select class="agent-select" id="agentSelector">
+        <option value="reasoning|deepseek/deepseek-r1:free,openrouter/free">🧠 Reasoning Agent (Logic & DeepSeek)</option>
+        <option value="speed|google/gemini-2.0-flash-exp:free,openrouter/free" selected>⚡ Fast General Assistant (Instant)</option>
+        <option value="coder|qwen/qwen-2.5-coder-32b-instruct:free,openrouter/free">💻 Full-Stack Coder (Web & Python)</option>
+        <option value="research|openrouter/free">🔍 Deep Research Agent (Structured)</option>
+        <option value="writer|openrouter/free">✍️ Creative Writer & Copywriter</option>
+        <option value="cyber|openrouter/free">🛡️ Cyber & DevOps Architect</option>
+        <option value="linguist|openrouter/free">🌐 Urdu & Multilingual Specialist</option>
       </select>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
@@ -277,8 +291,16 @@ body {
     <div class="feed" id="feed">
       <div class="doc-container" id="docContainer">
         <section class="welcome-hero" id="welcomeHero">
-          <h1 class="hero-title">What can Galaxy AI do for you?</h1>
-          <p class="hero-sub">Deep reasoning agents, Live Interactive Artifacts, Incognito chats, and 99.99% realistic photography.</p>
+          <h1 class="hero-title">Galaxy Autonomous Multi-Agent Suite</h1>
+          <p class="hero-sub">Switch between 7 specialized AI agents: Deep reasoning, Live Artifacts, full-stack coding, and 99.99% realistic photography.</p>
+          <div class="agent-chips">
+            <button class="agent-chip" onclick="switchAgentQuick('reasoning')">🧠 Deep Reasoning</button>
+            <button class="agent-chip" onclick="switchAgentQuick('coder')">💻 Web & App Coder</button>
+            <button class="agent-chip" onclick="switchAgentQuick('research')">🔍 Deep Research</button>
+            <button class="agent-chip" onclick="switchAgentQuick('writer')">✍️ Creative Writing</button>
+            <button class="agent-chip" onclick="switchAgentQuick('cyber')">🛡️ DevOps & Linux</button>
+            <button class="agent-chip" onclick="switchAgentQuick('linguist')">🌐 Urdu & Shayeri</button>
+          </div>
         </section>
         <div id="messagesArea" style="display:flex; flex-direction:column; gap:24px;"></div>
       </div>
@@ -319,7 +341,7 @@ body {
     <p>Personal preferences for tone, format, and long-term memory.</p>
     <div class="modal-field">
       <label>What tone should Galaxy AI use?</label>
-      <select class="model-select" id="userToneSelect" style="width:100%;">
+      <select class="agent-select" id="userToneSelect" style="width:100%;">
         <option value="Formal & Precise">Formal & Precise</option>
         <option value="Warm & Friendly">Warm & Friendly</option>
         <option value="Direct & Concise">Direct & Concise</option>
@@ -344,7 +366,6 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-// Safe Global Storage for Artifacts (Prevents JS Syntax Errors)
 window.__ARTIFACTS__ = {};
 
 const store = {
@@ -356,9 +377,7 @@ let chats = [], currentId = null, busy = false, isIncognito = false;
 try { chats = JSON.parse(store.get('chats', '[]')) || []; } catch { chats = []; }
 currentId = store.get('current');
 
-// Dedicated Incognito In-Memory Session
 let incognitoSession = { id: 'incognito_chat', title: 'Incognito Chat', messages: [] };
-
 const cur = () => isIncognito ? incognitoSession : (chats.find(c => c.id === currentId) || null);
 
 function save() {
@@ -368,18 +387,30 @@ function save() {
   }
 }
 
-/* Incognito Mode: Preserves in-memory chat without deleting it */
+/* Incognito Mode Toggle */
 $('#incognitoBtn').onclick = () => {
   isIncognito = !isIncognito;
   $('#incognitoBtn').classList.toggle('active', isIncognito);
   if (isIncognito) {
     incognitoSession = { id: 'incognito_' + uid(), title: 'Incognito Chat', messages: [] };
     renderFeed();
-    alert('Incognito Mode ON: This conversation stays in memory while you chat, but will NEVER be saved to history.');
+    alert('Incognito Mode ON: Active conversation will stay on screen while chatting, but will NEVER be saved to history.');
   } else {
     currentId = store.get('current');
     renderFeed();
   }
+};
+
+/* Quick Agent Switcher */
+window.switchAgentQuick = function(role) {
+  const sel = $('#agentSelector');
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value.startsWith(role + '|')) {
+      sel.selectedIndex = i;
+      break;
+    }
+  }
+  $('#userInput').focus();
 };
 
 /* Custom Preferences */
@@ -430,7 +461,7 @@ $('#micBtn').onclick = () => {
   rec.start();
 };
 
-/* Natural Photorealistic Image Translator (Converts Roman Urdu to Clean Natural English for FLUX) */
+/* Natural Photorealistic Image Translator */
 function translateToNaturalEnglishPrompt(prompt) {
   let p = prompt.toLowerCase()
     .replace(/(realistic|ultra realistic|real|picture|photo|banao|bana ke do|bana do|generate|image|draw|tasveer)/gi, ' ')
@@ -449,14 +480,12 @@ function translateToNaturalEnglishPrompt(prompt) {
        .replace(/\b(sham)\b/g, 'during golden hour sunset');
 
   p = p.replace(/\s+/g, ' ').trim();
-  // Pure natural photography prompt for FLUX.1 (No weird distortion filters)
   return `A realistic raw candid photograph of ${p}, authentic everyday real life, natural skin texture with real pores, natural eye contact, shot on 35mm lens, realistic depth of field, high quality documentary photo`;
 }
 
 function makeHyperRealisticFluxUrl(prompt, customSeed = null) {
   const seed = customSeed || Math.floor(Math.random() * 9999999);
   const cleanEnglish = translateToNaturalEnglishPrompt(prompt);
-  // Pure FLUX.1 without prompt-distortion parameters
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanEnglish)}?model=flux&width=1024&height=1024&nologo=true&seed=${seed}`;
 }
 
@@ -577,7 +606,7 @@ window.regenerateImage = function(btn, prompt) {
   img.onload = () => { img.style.opacity = '1'; };
 };
 
-/* Safe Artifact Runner (Fixes Syntax Errors) */
+/* Safe Artifact Runner */
 window.openArtifactById = function(artId) {
   const data = window.__ARTIFACTS__[artId];
   if (!data) return;
@@ -628,6 +657,9 @@ async function send(override) {
   aiRow.innerHTML = `<div class="doc-ai-label"><div class="emerald-dot" style="width:6px; height:6px;"></div> Galaxy AI</div><div class="doc-ai-body">...</div>`;
   box.appendChild(aiRow);
 
+  // Parse Agent Role & Model
+  const [selectedAgentRole, selectedModel] = $('#agentSelector').value.split('|');
+
   let full = '';
   try {
     const memory = store.get('memory', '');
@@ -638,7 +670,8 @@ async function send(override) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: $('#modelSelector').value,
+        agent: selectedAgentRole,
+        model: selectedModel,
         customPrompt,
         messages: c.messages.map(m => ({ role: m.role, content: m.content || m.text }))
       })
