@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<title>Galaxy AI — Claude Blueprint Suite</title>
+<title>Galaxy AI — Intelligent Suite</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050806">
 <link rel="manifest" href="/manifest.json">
@@ -14,7 +14,7 @@
 
 <style>
 /* ==========================================================================
-   EMERALD OBSIDIAN CLAUDE BLUEPRINT DESIGN SYSTEM
+   GALAXY AI EMERALD OBSIDIAN LUXURY DESIGN SYSTEM
    ========================================================================== */
 :root {
   --bg-primary: #050806;
@@ -65,17 +65,13 @@ body {
 }
 .new-btn:hover { background: var(--bg-hover); border-color: var(--border-active); box-shadow: 0 0 16px var(--emerald-glow); }
 
-/* Search Past Chats */
 .search-box {
   display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px;
   background: var(--bg-surface); border: 1px solid var(--border-subtle); margin-top: 4px;
 }
-.search-input {
-  width: 100%; background: transparent; border: 0; outline: 0; color: var(--text-main); font-size: 12.5px;
-}
+.search-input { width: 100%; background: transparent; border: 0; outline: 0; color: var(--text-main); font-size: 12.5px; }
 .search-input::placeholder { color: var(--text-faint); }
 
-/* Projects Section */
 .project-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-faint); margin-top: 8px; padding-left: 6px; display: flex; justify-content: space-between; align-items: center; }
 .project-item { padding: 7px 10px; border-radius: 8px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .project-item:hover { background: var(--bg-surface); color: var(--text-main); }
@@ -90,7 +86,6 @@ body {
 .chat-item.active { background: var(--bg-surface); color: var(--emerald-light); border-color: var(--border-subtle); }
 .chat-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 
-/* Footer User & Custom Settings */
 .sidebar-footer { padding-top: 8px; border-top: 1px solid var(--border-subtle); display: flex; gap: 6px; }
 .footer-tool-btn {
   flex: 1; padding: 7px; border-radius: 8px; background: var(--bg-surface); border: 1px solid var(--border-subtle);
@@ -106,20 +101,19 @@ body {
 }
 .topbar-left { display: flex; align-items: center; gap: 10px; }
 
-/* Model Selector Dropdown */
 .model-select {
   background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-main);
   padding: 6px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 500; cursor: pointer; outline: 0;
 }
 .model-select:hover { border-color: var(--emerald); }
 
-/* Incognito Mode Button */
 .incognito-toggle {
   background: var(--bg-surface); border: 1px solid var(--border-subtle); color: var(--text-muted);
   padding: 6px 12px; border-radius: 10px; font-size: 12.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: all 0.2s;
 }
 .incognito-toggle.active {
-  background: rgba(245, 158, 11, 0.12); border-color: var(--amber); color: var(--amber);
+  background: rgba(245, 158, 11, 0.15); border-color: var(--amber); color: var(--amber);
 }
 
 .icon-btn {
@@ -151,7 +145,7 @@ body {
 .thinking-content { padding: 12px 16px; font-family: var(--font-mono); font-size: 12.5px; color: var(--text-muted); border-top: 1px solid var(--border-subtle); line-height: 1.6; white-space: pre-wrap; display: none; }
 .thinking-box.expanded .thinking-content { display: block; }
 
-/* Claude Artifacts Split Screen */
+/* Galaxy Artifacts Split Screen */
 .artifact-drawer {
   width: 48%; background: var(--bg-secondary); border-left: 1px solid var(--border-subtle);
   display: none; flex-direction: column; z-index: 30;
@@ -239,19 +233,17 @@ body {
 
   <button class="new-btn" id="newChatBtn">+ New Chat</button>
 
-  <!-- Search Past Chats -->
   <div class="search-box">
     <span style="font-size:12px; color:var(--text-faint);">🔍</span>
     <input type="text" class="search-input" id="chatSearchInput" placeholder="Search past chats...">
   </div>
 
-  <!-- Projects / Workspaces -->
   <div class="project-section-title">
     <span>Projects</span>
     <button id="addProjectBtn" style="background:none; border:0; color:var(--emerald); cursor:pointer;">+</button>
   </div>
   <div id="projectList">
-    <div class="project-item">📁 General Research</div>
+    <div class="project-item">📁 General Workspace</div>
   </div>
 
   <div class="project-section-title"><span>Recent Chats</span></div>
@@ -267,15 +259,15 @@ body {
   <header class="topbar">
     <div class="topbar-left">
       <button class="icon-btn" id="openSidebarBtn">☰</button>
-      <!-- Model Selector (Reasoning vs Fast) -->
+      <!-- Multi-Agent Dropdown (All 100% Free) -->
       <select class="model-select" id="modelSelector">
-        <option value="deepseek/deepseek-r1:free,openrouter/free">🧠 Claude Hybrid Reasoning (DeepSeek-R1)</option>
-        <option value="openrouter/free">⚡ Claude Fast Speed Mode</option>
+        <option value="deepseek/deepseek-r1:free,openrouter/free">🧠 Galaxy Reasoning Agent (DeepSeek-R1)</option>
+        <option value="google/gemini-2.0-flash-exp:free,openrouter/free">⚡ Galaxy Speed Agent (Gemini Flash)</option>
+        <option value="qwen/qwen-2.5-coder-32b-instruct:free,openrouter/free">💻 Galaxy Coding Agent (Qwen 2.5 Coder)</option>
       </select>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
-      <!-- Incognito Mode Toggle -->
-      <button class="incognito-toggle" id="incognitoBtn" title="Incognito: Chat won't be saved to history">
+      <button class="incognito-toggle" id="incognitoBtn" title="Incognito: Temporary chat session, not saved to history">
         <span>👻</span> Incognito
       </button>
     </div>
@@ -286,34 +278,34 @@ body {
       <div class="doc-container" id="docContainer">
         <section class="welcome-hero" id="welcomeHero">
           <h1 class="hero-title">What can Galaxy AI do for you?</h1>
-          <p class="hero-sub">Full Claude Blueprint: Deep reasoning, Live Artifacts, Incognito chats, and 99.99% realistic photography.</p>
+          <p class="hero-sub">Deep reasoning agents, Live Interactive Artifacts, Incognito chats, and 99.99% realistic photography.</p>
         </section>
         <div id="messagesArea" style="display:flex; flex-direction:column; gap:24px;"></div>
       </div>
     </div>
 
-    <!-- Claude Artifacts Split Screen Panel -->
+    <!-- Galaxy Interactive Artifacts Split Screen -->
     <aside class="artifact-drawer" id="artifactDrawer">
       <div class="artifact-top">
         <div class="artifact-tabs">
-          <button class="artifact-tab-btn active" id="tabPreviewBtn">Preview</button>
-          <button class="artifact-tab-btn" id="tabCodeBtn">Code</button>
+          <button class="artifact-tab-btn active" id="tabPreviewBtn">Interactive App</button>
+          <button class="artifact-tab-btn" id="tabCodeBtn">Code View</button>
         </div>
         <div style="display:flex; gap:6px;">
           <button class="img-act-btn" id="copyArtifactBtn">Copy Code</button>
           <button class="icon-btn" id="closeArtifactBtn" style="width:28px;height:28px;">✕</button>
         </div>
       </div>
-      <iframe class="artifact-preview-frame" id="artifactFrame" sandbox="allow-scripts"></iframe>
+      <iframe class="artifact-preview-frame" id="artifactFrame" sandbox="allow-scripts allow-modals"></iframe>
       <div class="artifact-code-view" id="artifactCode"></div>
     </aside>
   </div>
 
   <div class="composer-dock">
     <div class="composer-box">
-      <button class="tool-btn" id="imgToolBtn" title="Generate 99.99% Photorealistic Image">🎨</button>
-      <textarea class="composer-textarea" id="userInput" rows="1" placeholder="Reply or give a command in any language..."></textarea>
-      <button class="tool-btn" id="micBtn" title="Voice Mode">
+      <button class="tool-btn" id="imgToolBtn" title="Generate Realistic Photo">🎨</button>
+      <textarea class="composer-textarea" id="userInput" rows="1" placeholder="Reply or ask anything in any language..."></textarea>
+      <button class="tool-btn" id="micBtn" title="Voice Input">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
       </button>
       <button class="send-action" id="sendBtn" disabled>↑</button>
@@ -321,7 +313,6 @@ body {
   </div>
 </main>
 
-<!-- Customize & Memory Modal -->
 <div class="modal-overlay" id="customizeModal">
   <div class="modal-card">
     <h3>Customize Galaxy AI</h3>
@@ -329,18 +320,18 @@ body {
     <div class="modal-field">
       <label>What tone should Galaxy AI use?</label>
       <select class="model-select" id="userToneSelect" style="width:100%;">
-        <option value="Formal & Precise">Formal & Precise (Claude Default)</option>
+        <option value="Formal & Precise">Formal & Precise</option>
         <option value="Warm & Friendly">Warm & Friendly</option>
         <option value="Direct & Concise">Direct & Concise</option>
       </select>
     </div>
     <div class="modal-field">
       <label>Memory & Custom Instructions</label>
-      <textarea class="modal-textarea" id="customInstructionsInput" placeholder="Tell AI what to remember about you (e.g. I am a software engineer, always reply with code first)..."></textarea>
+      <textarea class="modal-textarea" id="customInstructionsInput" placeholder="Tell Galaxy AI what to remember about you..."></textarea>
     </div>
     <div class="modal-actions">
       <button class="img-act-btn" id="closeModalBtn">Cancel</button>
-      <button class="img-act-btn" id="saveModalBtn" style="background:var(--emerald); color:#060907;">Save Settings</button>
+      <button class="img-act-btn" id="saveModalBtn" style="background:var(--emerald); color:#060907;">Save</button>
     </div>
   </div>
 </div>
@@ -353,6 +344,9 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
+// Safe Global Storage for Artifacts (Prevents JS Syntax Errors)
+window.__ARTIFACTS__ = {};
+
 const store = {
   get(k, d=null) { try { const v = localStorage.getItem('gai:'+k); return v === null ? d : v; } catch { return d; } },
   set(k, v) { try { localStorage.setItem('gai:'+k, v); return true; } catch { return false; } }
@@ -362,29 +356,33 @@ let chats = [], currentId = null, busy = false, isIncognito = false;
 try { chats = JSON.parse(store.get('chats', '[]')) || []; } catch { chats = []; }
 currentId = store.get('current');
 
+// Dedicated Incognito In-Memory Session
+let incognitoSession = { id: 'incognito_chat', title: 'Incognito Chat', messages: [] };
+
+const cur = () => isIncognito ? incognitoSession : (chats.find(c => c.id === currentId) || null);
+
 function save() {
   if (!isIncognito) {
     store.set('chats', JSON.stringify(chats));
     store.set('current', currentId || '');
   }
 }
-const cur = () => chats.find(c => c.id === currentId) || null;
 
-/* Incognito Mode Toggle */
+/* Incognito Mode: Preserves in-memory chat without deleting it */
 $('#incognitoBtn').onclick = () => {
   isIncognito = !isIncognito;
   $('#incognitoBtn').classList.toggle('active', isIncognito);
   if (isIncognito) {
-    currentId = null;
+    incognitoSession = { id: 'incognito_' + uid(), title: 'Incognito Chat', messages: [] };
     renderFeed();
-    alert('Incognito Mode ON: This chat is temporary and will NOT be saved to history.');
+    alert('Incognito Mode ON: This conversation stays in memory while you chat, but will NEVER be saved to history.');
   } else {
     currentId = store.get('current');
     renderFeed();
   }
 };
 
-/* Custom Preferences Modal */
+/* Custom Preferences */
 $('#openCustomizeModalBtn').onclick = () => {
   $('#customInstructionsInput').value = store.get('memory', '');
   $('#userToneSelect').value = store.get('tone', 'Formal & Precise');
@@ -395,19 +393,17 @@ $('#saveModalBtn').onclick = () => {
   store.set('memory', $('#customInstructionsInput').value);
   store.set('tone', $('#userToneSelect').value);
   $('#customizeModal').classList.remove('open');
-  alert('Preferences saved successfully!');
 };
 
 /* Search Past Chats */
 $('#chatSearchInput').oninput = (e) => {
   const query = e.target.value.toLowerCase().trim();
-  const items = document.querySelectorAll('.chat-item');
-  items.forEach(el => {
+  document.querySelectorAll('.chat-item').forEach(el => {
     el.style.display = el.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
   });
 };
 
-/* Projects Organizer */
+/* Projects */
 $('#addProjectBtn').onclick = () => {
   const name = prompt('Enter Project Name:');
   if (name && name.trim()) {
@@ -418,11 +414,11 @@ $('#addProjectBtn').onclick = () => {
   }
 };
 
-/* Speech Recognition (Voice Mode) */
+/* Voice Input */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, isRecording = false;
 $('#micBtn').onclick = () => {
-  if (!SR) return alert('Speech recognition is not supported in this browser.');
+  if (!SR) return alert('Speech recognition not supported in this browser.');
   if (isRecording && rec) { rec.stop(); return; }
   rec = new SR();
   rec.onstart = () => { isRecording = true; $('#micBtn').classList.add('active-mic'); };
@@ -434,27 +430,34 @@ $('#micBtn').onclick = () => {
   rec.start();
 };
 
-/* 99.99% Photorealistic Image Engine */
-function translateRomanUrduToEnglish(prompt) {
-  let p = prompt.toLowerCase().replace(/(realistic|ultra realistic|real|picture|photo|banao|bana ke do|generate|image|draw|tasveer)/gi, ' ').trim();
-  const dict = [
-    { r: /\b(banda|admi|aadmi|mard)\b/g, e: 'middle-aged man with natural weathered skin and stubble' },
-    { r: /\b(ciggrate|cigarette|sigret)\s*(pi raha|peeta|pee raha)?\b/g, e: 'smoking a burning cigarette with detailed smoke' },
-    { r: /\b(plastic ki chair|plastic chair)\b/g, e: 'weathered white monobloc plastic outdoor chair' },
-    { r: /\b(beth k|betha|baitha)\b/g, e: 'sitting' },
-    { r: /\b(purani|purana)\b/g, e: 'aged vintage' },
-    { r: /\b(haveli|mahal)\b/g, e: 'ancient architectural mansion' },
-    { r: /\b(raat)\b/g, e: 'night with cinematic moonlit shadows' }
-  ];
-  dict.forEach(item => { p = p.replace(item.r, item.e); });
-  return p.replace(/\s+/g, ' ').trim() || prompt;
+/* Natural Photorealistic Image Translator (Converts Roman Urdu to Clean Natural English for FLUX) */
+function translateToNaturalEnglishPrompt(prompt) {
+  let p = prompt.toLowerCase()
+    .replace(/(realistic|ultra realistic|real|picture|photo|banao|bana ke do|bana do|generate|image|draw|tasveer)/gi, ' ')
+    .trim();
+
+  p = p.replace(/\b(banda|admi|aadmi|mard)\b/g, 'a middle-aged South Asian man')
+       .replace(/\b(larka|chora)\b/g, 'a young boy')
+       .replace(/\b(larki|aurat|khatoon)\b/g, 'a woman')
+       .replace(/\b(ciggrate|cigarette|sigret)\s*(pi raha|peeta|pee raha|peena)?\b/g, 'holding and smoking a lit cigarette with delicate smoke swirls')
+       .replace(/\b(plastic ki chair|plastic chair|kursi)\b/g, 'sitting on a worn white monobloc plastic lawn chair')
+       .replace(/\b(beth k|betha|baitha)\b/g, '')
+       .replace(/\b(py|par|pe)\b/g, '')
+       .replace(/\b(purani|purana)\b/g, 'aged vintage')
+       .replace(/\b(haveli|mahal|makan)\b/g, 'ancient haveli courtyard')
+       .replace(/\b(raat)\b/g, 'at night with cinematic ambient lighting')
+       .replace(/\b(sham)\b/g, 'during golden hour sunset');
+
+  p = p.replace(/\s+/g, ' ').trim();
+  // Pure natural photography prompt for FLUX.1 (No weird distortion filters)
+  return `A realistic raw candid photograph of ${p}, authentic everyday real life, natural skin texture with real pores, natural eye contact, shot on 35mm lens, realistic depth of field, high quality documentary photo`;
 }
 
 function makeHyperRealisticFluxUrl(prompt, customSeed = null) {
   const seed = customSeed || Math.floor(Math.random() * 9999999);
-  const cleanSubject = translateRomanUrduToEnglish(prompt);
-  const cinemaPrompt = `A raw candid 35mm film documentary photograph of ${cleanSubject}, authentic human skin texture with natural pores, unedited natural ambient lighting, shot on Canon EOS R5 85mm f1.4 lens, depth of field with soft bokeh, award-winning national geographic portrait photography, 8k resolution, authentic everyday realism`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(cinemaPrompt)}?width=1024&height=1024&model=flux&enhance=true&nologo=true&seed=${seed}`;
+  const cleanEnglish = translateToNaturalEnglishPrompt(prompt);
+  // Pure FLUX.1 without prompt-distortion parameters
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanEnglish)}?model=flux&width=1024&height=1024&nologo=true&seed=${seed}`;
 }
 
 function parseAIContent(raw) {
@@ -475,7 +478,7 @@ function parseAIContent(raw) {
 
   let artifactCode = null;
   const codeMatch = text.match(/```([a-z]*)\n([\s\S]*?)```/i);
-  if (codeMatch && codeMatch[2].length > 120) {
+  if (codeMatch && codeMatch[2].length > 80) {
     artifactCode = { lang: codeMatch[1] || 'code', code: codeMatch[2] };
   }
 
@@ -489,7 +492,7 @@ function renderList() {
     const d = document.createElement('div');
     d.className = 'chat-item' + (c.id === currentId ? ' active' : '');
     d.innerHTML = `<span>${esc(c.title)}</span>`;
-    d.onclick = () => { currentId = c.id; save(); renderFeed(); toggleSidebar(false); };
+    d.onclick = () => { if (!isIncognito) { currentId = c.id; save(); renderFeed(); toggleSidebar(false); } };
     l.appendChild(d);
   });
 }
@@ -529,7 +532,7 @@ function renderFeed() {
           <div class="image-showcase">
             <img src="${url}" onclick="openLightbox('${url}')" loading="lazy">
             <div class="image-toolbar">
-              <span>✨ 99.99% Ultra-Realistic (Flux Realism)</span>
+              <span>✨ 99.99% Photorealistic (FLUX.1)</span>
               <div class="img-actions">
                 <button class="img-act-btn" onclick="regenerateImage(this, '${esc(imgPrompt)}')">🔄 Regenerate</button>
                 <a class="img-act-btn" href="${url}" target="_blank" download="real-photo.jpg">Download 8K</a>
@@ -540,13 +543,15 @@ function renderFeed() {
 
       let artifactHtml = '';
       if (artifactCode) {
+        const artId = 'art_' + uid();
+        window.__ARTIFACTS__[artId] = { code: artifactCode.code, lang: artifactCode.lang };
         artifactHtml = `
           <div style="margin:12px 0; padding:12px 16px; border-radius:12px; background:var(--bg-surface); border:1px solid var(--border-active); display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-size:13px; font-weight:600;">Claude Artifact (${artifactCode.lang})</div>
-              <div style="font-size:11.5px; color:var(--text-muted);">Click to open interactive preview</div>
+              <div style="font-size:13px; font-weight:600;">Galaxy Artifact (${artifactCode.lang})</div>
+              <div style="font-size:11.5px; color:var(--text-muted);">Interactive Live Application</div>
             </div>
-            <button class="img-act-btn" onclick="openArtifact('${esc(artifactCode.code)}', '${artifactCode.lang}')">Open Artifact ↗</button>
+            <button class="img-act-btn" onclick="openArtifactById('${artId}')">Open Artifact ↗</button>
           </div>`;
       }
 
@@ -572,6 +577,27 @@ window.regenerateImage = function(btn, prompt) {
   img.onload = () => { img.style.opacity = '1'; };
 };
 
+/* Safe Artifact Runner (Fixes Syntax Errors) */
+window.openArtifactById = function(artId) {
+  const data = window.__ARTIFACTS__[artId];
+  if (!data) return;
+  $('#artifactCode').textContent = data.code;
+  const frame = $('#artifactFrame');
+  if (data.lang === 'html' || data.code.includes('<html') || data.code.includes('<!DOCTYPE') || data.code.includes('<div') || data.code.includes('<button')) {
+    frame.srcdoc = data.code;
+    frame.style.display = 'block';
+    $('#artifactCode').style.display = 'none';
+    $('#tabPreviewBtn').classList.add('active');
+    $('#tabCodeBtn').classList.remove('active');
+  } else {
+    frame.style.display = 'none';
+    $('#artifactCode').style.display = 'block';
+    $('#tabPreviewBtn').classList.remove('active');
+    $('#tabCodeBtn').classList.add('active');
+  }
+  $('#artifactDrawer').classList.add('open');
+};
+
 async function send(override) {
   if (busy) return;
   const input = $('#userInput');
@@ -582,8 +608,12 @@ async function send(override) {
   let c = cur();
   if (!c) {
     c = { id: uid(), title: text.slice(0, 32), messages: [] };
-    if (!isIncognito) chats.unshift(c);
-    currentId = c.id; save(); renderList();
+    if (!isIncognito) {
+      chats.unshift(c);
+      currentId = c.id;
+      save();
+      renderList();
+    }
   }
 
   c.messages.push({ role: 'user', content: text, text: text });
@@ -654,24 +684,6 @@ async function send(override) {
 function updateSend() { $('#sendBtn').disabled = !$('#userInput').value.trim(); }
 function toggleSidebar(on) { $('#sidebar').classList.toggle('open', on); }
 
-/* Interactive Artifacts Split Screen */
-window.openArtifact = function(code, lang) {
-  $('#artifactCode').textContent = code;
-  const frame = $('#artifactFrame');
-  if (lang === 'html' || code.includes('<html') || code.includes('<!DOCTYPE')) {
-    frame.srcdoc = code;
-    frame.style.display = 'block';
-    $('#artifactCode').style.display = 'none';
-    $('#tabPreviewBtn').classList.add('active');
-    $('#tabCodeBtn').classList.remove('active');
-  } else {
-    frame.style.display = 'none';
-    $('#artifactCode').style.display = 'block';
-    $('#tabPreviewBtn').classList.remove('active');
-    $('#tabCodeBtn').classList.add('active');
-  }
-  $('#artifactDrawer').classList.add('open');
-};
 $('#tabPreviewBtn').onclick = () => {
   $('#artifactFrame').style.display = 'block';
   $('#artifactCode').style.display = 'none';
@@ -690,23 +702,30 @@ $('#copyArtifactBtn').onclick = () => {
   alert('Code copied!');
 };
 
-/* Lightbox */
 function openLightbox(url) {
   $('#lightboxImg').src = url;
   $('#lightbox').classList.add('open');
 }
 $('#lightbox').onclick = () => $('#lightbox').classList.remove('open');
 
-/* Initial Event Bindings */
 $('#openSidebarBtn').onclick = () => toggleSidebar(true);
 $('#closeSidebarBtn').onclick = () => toggleSidebar(false);
-$('#newChatBtn').onclick = () => { currentId = null; save(); renderFeed(); toggleSidebar(false); };
+$('#newChatBtn').onclick = () => {
+  if (isIncognito) {
+    incognitoSession = { id: 'incognito_' + uid(), title: 'Incognito Chat', messages: [] };
+  } else {
+    currentId = null;
+    save();
+  }
+  renderFeed();
+  toggleSidebar(false);
+};
 $('#clearChatsBtn').onclick = () => { if (confirm('Delete all saved chats?')) { chats = []; currentId = null; save(); renderList(); renderFeed(); } };
 $('#userInput').oninput = updateSend;
 $('#userInput').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
 $('#sendBtn').onclick = () => send();
 $('#imgToolBtn').onclick = () => {
-  const p = prompt('Describe the realistic photo you want:');
+  const p = prompt('Describe the photo you want:');
   if (p && p.trim()) send('realistic picture banao ' + p.trim());
 };
 
