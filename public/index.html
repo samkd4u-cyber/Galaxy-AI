@@ -29,6 +29,7 @@
   --text-main: #edf5f0;
   --text-muted: #839e90;
   --text-faint: #4e6358;
+  --danger: #f43f5e;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --shadow-lux: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
@@ -192,7 +193,7 @@ body {
 <main class="stage">
   <header class="topbar">
     <button class="icon-btn" id="openSidebarBtn">☰</button>
-    <div style="font-weight: 600; font-size: 14px; color: var(--text-muted);">Galaxy AI • DeepSeek-R1 & Claude Suite</div>
+    <div style="font-weight: 600; font-size: 14px; color: var(--text-muted);">Galaxy AI • DeepSeek & Claude Suite</div>
     <div style="width:36px;"></div>
   </header>
 
@@ -270,11 +271,49 @@ $('#micBtn').onclick = () => {
   rec.start();
 };
 
-/* 99.99% Photorealistic Image Pipeline */
-function makeHyperRealisticFluxUrl(prompt) {
-  const seed = Math.floor(Math.random() * 9999999);
-  const enhanced = `${prompt}, 35mm photograph, shot on Hasselblad H6D-100c, real human skin pores, authentic cinematic natural lighting, 8k, raw color, photorealistic candid, award winning photography`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1024&height=1024&model=flux-realism&nologo=true&seed=${seed}`;
+/* ==========================================================================
+   SMART ROMAN URDU TRANSLATOR & 99.99% FLUX PHOTOGRAPHY ENGINE
+   ========================================================================== */
+function translateRomanUrduToEnglish(prompt) {
+  let p = prompt.toLowerCase();
+  
+  // Remove trigger words
+  p = p.replace(/(realistic|ultra realistic|real|picture|photo|banao|bana ke do|bana do|generate|image|draw|tasveer)/gi, ' ').trim();
+  
+  // Roman Urdu vocabulary to English
+  const dict = [
+    { r: /\b(banda|admi|aadmi|mard)\b/g, e: 'middle-aged man with natural weathered skin and stubble' },
+    { r: /\b(larka|chora)\b/g, e: 'young man' },
+    { r: /\b(larki|aurat|khatoon)\b/g, e: 'woman' },
+    { r: /\b(ciggrate|cigarette|sigret|cigrate)\s*(pi raha|peeta|pee raha|peena|smoking)?\b/g, e: 'smoking a burning cigarette with realistic swirling smoke' },
+    { r: /\b(plastic ki chair|plastic chair)\b/g, e: 'weathered white monobloc plastic outdoor chair' },
+    { r: /\b(chair|kursi)\b/g, e: 'chair' },
+    { r: /\b(beth k|betha|baitha|bethi)\b/g, e: 'sitting comfortably' },
+    { r: /\b(purani|purana)\b/g, e: 'vintage aged' },
+    { r: /\b(haveli|mahal|makan)\b/g, e: 'ancient atmospheric royal mansion' },
+    { r: /\b(raat|rat)\b/g, e: 'night atmosphere with soft moonlit shadows' },
+    { r: /\b(sham|dusk)\b/g, e: 'golden hour sunset light' },
+    { r: /\b(barish|toofan)\b/g, e: 'dramatic rainy wet atmosphere' },
+    { r: /\b(billi)\b/g, e: 'cat' },
+    { r: /\b(kutta)\b/g, e: 'dog' },
+    { r: /\b(gari|car)\b/g, e: 'car' }
+  ];
+
+  dict.forEach(item => { p = p.replace(item.r, item.e); });
+  return p.replace(/\s+/g, ' ').trim() || prompt;
+}
+
+function makeHyperRealisticFluxUrl(prompt, customSeed = null) {
+  const seed = customSeed || Math.floor(Math.random() * 9999999);
+  
+  // Translate & clean
+  const translatedSubject = translateRomanUrduToEnglish(prompt);
+  
+  // Masterpiece 85mm DSLR cinematic optics
+  const cinemaPrompt = `A raw candid 35mm film documentary photograph of ${translatedSubject}, authentic natural human skin texture with real pores and fine wrinkles, unedited natural ambient lighting, shot on Canon EOS R5 85mm f1.4 lens, depth of field with soft bokeh, award-winning national geographic portrait photography, color graded, unedited, 8k resolution, authentic everyday realism`;
+  
+  // True FLUX.1 Model with prompt enhancement
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(cinemaPrompt)}?width=1024&height=1024&model=flux&enhance=true&nologo=true&seed=${seed}`;
 }
 
 function parseAIContent(raw) {
@@ -351,8 +390,8 @@ function renderFeed() {
             <div class="image-toolbar">
               <span>✨ 99.99% Ultra-Realistic (Flux Realism)</span>
               <div class="img-actions">
-                <button class="img-act-btn" onclick="navigator.clipboard.writeText('${esc(imgPrompt)}'); alert('Prompt copied!');">Copy Prompt</button>
-                <a class="img-act-btn" href="${url}" target="_blank" download="realistic-photo.jpg">Download 8K</a>
+                <button class="img-act-btn" onclick="regenerateImage(this, '${esc(imgPrompt)}')">🔄 Regenerate</button>
+                <a class="img-act-btn" href="${url}" target="_blank" download="real-photo.jpg">Download 8K</a>
               </div>
             </div>
           </div>`;
@@ -381,6 +420,18 @@ function renderFeed() {
   });
   $('#feed').scrollTop = $('#feed').scrollHeight;
 }
+
+window.regenerateImage = function(btn, prompt) {
+  const imgCard = btn.closest('.image-showcase');
+  const img = imgCard.querySelector('img');
+  const newSeed = Math.floor(Math.random() * 9999999);
+  const newUrl = makeHyperRealisticFluxUrl(prompt, newSeed);
+  img.style.opacity = '0.4';
+  img.src = newUrl;
+  img.onload = () => { img.style.opacity = '1'; };
+  const dlBtn = imgCard.querySelector('a[download]');
+  if (dlBtn) dlBtn.href = newUrl;
+};
 
 async function send(override) {
   if (busy) return;
@@ -445,8 +496,9 @@ async function send(override) {
     full = `Error: ${err.message}`;
   }
 
+  // Guaranteed fallback for image request
   if (isDirectImageReq && !full.includes('[IMAGE:')) {
-    full += `\n\n[IMAGE: award-winning hyperrealistic raw 35mm documentary photograph of ${text}, Hasselblad H6D-100c, real human skin pores and texture, natural candid lighting, 8k resolution, cinematic masterpiece]`;
+    full += `\n\n[IMAGE: ${text}]`;
   }
 
   c.messages.push({ role: 'assistant', content: full, text: full });
@@ -480,7 +532,7 @@ $('#userInput').oninput = updateSend;
 $('#userInput').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
 $('#sendBtn').onclick = () => send();
 $('#imgToolBtn').onclick = () => {
-  const p = prompt('Describe the realistic photo you want:');
+  const p = prompt('Describe the photo you want:');
   if (p && p.trim()) send('realistic picture banao ' + p.trim());
 };
 
