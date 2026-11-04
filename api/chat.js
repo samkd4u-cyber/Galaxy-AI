@@ -1,32 +1,25 @@
-// Galaxy AI - Ultra-Premium Claude 3.7 Engine (Vercel Edge Runtime)
+// Galaxy AI - Full Claude Blueprint Engine (Vercel Edge Runtime)
 export const config = { runtime: 'edge' };
 
-const SYSTEM_PROMPT = `You are Galaxy AI, an ultra-smart, proactive assistant mirroring Claude 3.7.
+const BASE_SYSTEM_PROMPT = `You are Galaxy AI, an ultra-intelligent, precise assistant built to match Claude 3.7 standards.
 
-EXECUTION PRINCIPLES:
-1. DIRECT ACTION: Fulfill user commands immediately and completely. NEVER give annoying multiple-choice options or generic greeting questions.
+CORE PRINCIPLES:
+1. DIRECT ACTION: Fulfill user commands immediately and completely. Never ask unnecessary questions or pop up options for basic greetings.
 2. REASONING: When solving complex, coding, or reasoning problems, formulate clear thoughts inside:
 <think>
 [Concise, structured analytical steps]
 </think>
-3. LANGUAGE: Always respond naturally in the user's language (Roman Urdu, Urdu, English, etc.).
+3. LANGUAGE: Match the user's language naturally (Roman Urdu, Urdu, English, etc.).
+
+CODE & ARTIFACTS:
+When writing HTML, CSS, JavaScript, SVG, or complete applications, always output clean markdown code blocks with the language tag (e.g. \`\`\`html ... \`\`\`).
 
 ULTRA-REALISTIC 99.99% IMAGE GENERATION:
-When the user asks for ANY photo, picture, or portrait in any language (e.g., "realistic picture banao", "photo banao", "tasveer banao", "generate image"):
-- Reply in 1 warm sentence in their language.
+When the user asks for ANY photo, picture, or portrait in any language:
+- Reply in 1 warm sentence.
 - At the very end of your response, output strictly:
 [IMAGE: <masterpiece English photographic prompt>]
-
-PROMPT CRAFTING RULES:
-Inside [IMAGE: ...], formulate a raw, hyper-detailed photography prompt:
-"award-winning 35mm candid documentary photograph, Hasselblad H6D-100c 85mm f/1.2 lens, ultra-realistic human skin with authentic pores and fine textures, natural cinematic studio lighting, shallow depth of field, 8k resolution, raw photo, film grain, unedited real life photo".
-Never mention CGI, cartoon, render, or illustration.
-
-CODE:
-Format code cleanly inside standard markdown blocks:
-\`\`\`language
-...
-\`\`\``;
+Include: "award-winning 35mm candid documentary photograph, Hasselblad H6D-100c 85mm f/1.2 lens, ultra-realistic human skin with authentic pores and fine textures, natural cinematic studio lighting, shallow depth of field, 8k resolution, raw photo, film grain, unedited real life photo".`;
 
 const MAX_MESSAGES = 30;
 const MAX_TEXT_CHARS = 60000;
@@ -43,7 +36,7 @@ export default async function handler(req) {
 
   const API_KEY = process.env.API_KEY;
   const API_BASE = (process.env.API_BASE || 'https://openrouter.ai/api/v1').replace(/\/+$/, '');
-  const MODEL = process.env.MODEL || 'deepseek/deepseek-r1:free,openrouter/free';
+  const DEFAULT_MODEL = process.env.MODEL || 'deepseek/deepseek-r1:free,openrouter/free';
 
   if (!API_KEY) return json({ error: 'Server API_KEY is missing' }, 500);
 
@@ -53,6 +46,9 @@ export default async function handler(req) {
   } catch {
     return json({ error: 'Invalid JSON request' }, 400);
   }
+
+  const requestedModel = body?.model || DEFAULT_MODEL;
+  const customSystemPrompt = body?.customPrompt ? `${BASE_SYSTEM_PROMPT}\n\nUSER CUSTOM INSTRUCTIONS & MEMORY:\n${body.customPrompt}` : BASE_SYSTEM_PROMPT;
 
   const rawMsgs = Array.isArray(body?.messages) ? body.messages : [];
   if (!rawMsgs.length) return json({ error: 'No messages provided' }, 400);
@@ -65,7 +61,7 @@ export default async function handler(req) {
     };
   });
 
-  const models = MODEL.split(',').map(m => m.trim()).filter(Boolean);
+  const models = requestedModel.split(',').map(m => m.trim()).filter(Boolean);
   let upstream = null, lastError = '';
 
   for (const model of models) {
@@ -82,7 +78,7 @@ export default async function handler(req) {
           model,
           stream: true,
           temperature: 0.6,
-          messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...cleanMsgs]
+          messages: [{ role: 'system', content: customSystemPrompt }, ...cleanMsgs]
         }),
         signal: req.signal
       });
